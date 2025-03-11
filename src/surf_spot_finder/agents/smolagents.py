@@ -24,7 +24,7 @@ def load_smolagent(model_id: str, api_key_var: Optional[str]) -> "CodeAgent":
         api_key_var=os.environ[api_key_var] if api_key_var else None,
     )
 
-    if "GOOGLE_MAPS_api_key_var" in os.environ:
+    if "GOOGLE_MAPS_API_KEY" in os.environ:
         # We could easily use any of the MCPs at https://github.com/modelcontextprotocol/servers
         # or at https://glama.ai/mcp/servers
         # or at https://smithery.ai/
