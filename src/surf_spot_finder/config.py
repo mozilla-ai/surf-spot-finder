@@ -4,7 +4,7 @@ from pydantic import AfterValidator, BaseModel, FutureDatetime, PositiveInt
 
 DEFAULT_PROMPT = (
     "What will be the best surf spot around {LOCATION}"
-    ", in a radio of {MAX_DRIVING_HOURS} driving"
+    ", in a radio of {MAX_DRIVING_HOURS} hours driving"
     ", at {DATE}?"
 )
 
