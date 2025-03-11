@@ -3,17 +3,26 @@ requires = ["setuptools>=48", "setuptools_scm[toml]>=6.3.1"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "blueprint"
+name = "surf-spot-finder"
 readme = "README.md"
 license = {text = "Apache-2.0"}
 requires-python = ">=3.10"
 dynamic = ["version"]
 dependencies = [
+  "arize-phoenix>=8.12.1",
+  "fire",
   "loguru",
-  "streamlit",
+  "mcp>=1.3.0",
+  "pydantic",
+  "smolagents[litellm,mcp,telemetry]>=1.10.0",
 ]
 
 [project.optional-dependencies]
+demo = [
+  "gradio",
+  "spaces"
+]
+
 docs = [
   "mkdocs",
   "mkdocs-material",
@@ -26,9 +35,9 @@ tests = [
 ]
 
 [project.urls]
-Documentation = "https://mozilla-ai.github.io/Blueprint-template/"
-Issues = "https://github.com/mozilla-ai/Blueprint-template/issues"
-Source = "https://github.com/mozilla-ai/Blueprint-template"
+Documentation = "https://mozilla-ai.github.io/surf-spot-finder/"
+Issues = "https://github.com/mozilla-ai/surf-spot-finder/issues"
+Source = "https://github.com/mozilla-ai/surf-spot-finder"
 
 [tool.setuptools.packages.find]
 exclude = ["tests", "tests.*"]
@@ -36,3 +45,6 @@ where = ["src"]
 namespaces = false
 
 [tool.setuptools_scm]
+
+[project.scripts]
+find-surf-spot = "surf_spot_finder.cli:main"

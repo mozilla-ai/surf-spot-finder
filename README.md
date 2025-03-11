@@ -13,7 +13,7 @@ This blueprint guides you to ...
 
 📘 To explore this project further and discover other Blueprints, visit the [**Blueprints Hub**](https://developer-hub.mozilla.ai/).
 
-👉 📖 For more detailed guidance on using this project, please visit our [**Docs here**](https://mozilla-ai.github.io/Blueprint-template/)
+👉 📖 For more detailed guidance on using this project, please visit our [**Docs here**](https://mozilla-ai.github.io/surf-spot-finder/)
 
 ### Built with
 - Python 3.10+
