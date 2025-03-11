@@ -36,7 +36,7 @@ def find_surf_spot(
     agent = load_smolagent(config.model_id, config.api_key_var)
 
     logger.info("Setting up tracing")
-    setup_tracing(project_name="find-surf-sport", json_tracer=config.json_tracer)
+    setup_tracing(project_name="find-surf-spot", json_tracer=config.json_tracer)
 
     logger.info("Running agent")
     agent.run(
