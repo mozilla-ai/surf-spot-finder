@@ -1,4 +1,4 @@
-from typing import Annotated, Optional
+from typing import Annotated, Literal, Optional
 from pydantic import AfterValidator, BaseModel, FutureDatetime, PositiveInt
 from datetime import datetime
 
@@ -27,6 +27,7 @@ class Config(BaseModel):
     max_driving_hours: PositiveInt
     date: FutureDatetime
     model_id: str
+    agent_type: Literal["smolagents", "openai"] = "smolagents"
     api_key_var: Optional[str] = None
     json_tracer: bool = True
     api_base: Optional[str] = None
