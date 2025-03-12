@@ -8,23 +8,29 @@ if TYPE_CHECKING:
 
 
 @logger.catch(reraise=True)
-def run_smolagent(model_id: str, prompt: str, api_key_var: Optional[str] = None, api_base: Optional[str] = None) -> "CodeAgent":
+def run_smolagent(
+    model_id: str,
+    prompt: str,
+    api_key_var: Optional[str] = None,
+    api_base: Optional[str] = None,
+) -> "CodeAgent":
     """
     Create and configure a Smolagents CodeAgent with the specified model.
     See https://docs.litellm.ai/docs/providers for details on available LiteLLM providers.
     Args:
         model_id (str): Model identifier using LiteLLM syntax (e.g., 'openai/o1', 'anthropic/claude-3-sonnet')
+        prompt (str): Prompt to provide to the model
         api_key_var (Optional[str]): Name of environment variable containing the API key
         api_base (Optional[str]): Custom API base URL, if needed for non-default endpoints
-        
+
     Returns:
         CodeAgent: Configured agent ready to process requests
-        
+
     Example:
-        >>> agent = run_smolagent("anthropic/claude-3-haiku", "ANTHROPIC_API_KEY", None, None)
+        >>> agent = run_smolagent("anthropic/claude-3-haiku", "my prompt here", "ANTHROPIC_API_KEY", None, None)
         >>> agent.run("Find surf spots near San Diego")
     """
-    from smolagents import ( # pylint: disable=import-outside-toplevel
+    from smolagents import (  # pylint: disable=import-outside-toplevel
         CodeAgent,
         DuckDuckGoSearchTool,
         LiteLLMModel,
@@ -61,7 +67,7 @@ def run_smolagent(model_id: str, prompt: str, api_key_var: Optional[str] = None,
                 DuckDuckGoSearchTool(),
             ],
             model=model,
-            add_base_tools=False # Turn this on if you want to let it run python code as it sees fit
+            add_base_tools=False,  # Turn this on if you want to let it run python code as it sees fit
         )
         agent.run(prompt)
 

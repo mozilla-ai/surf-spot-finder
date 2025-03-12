@@ -17,11 +17,11 @@ In this Blueprint, we demonstrate an AI agent designed for an extremely specific
 that is given the web and searching access it needs to find an answer the same way you would find the answer as a human.
 
 This agent is designed for help in finding the next great surf spot near you: the agent is provided with a location, a distance,
-a timestamp, and it's able to independently search and browse the web to recommend the best spot to you along with the 
+a timestamp, and it's able to independently search and browse the web to recommend the best spot to you along with the
 relevant information!
 
-Although this exact use-case may not be useful to you directly, the framework we provide here is intended to be easily 
-adapted to the Agent use case you have in mind. 
+Although this exact use-case may not be useful to you directly, the framework we provide here is intended to be easily
+adapted to the Agent use case you have in mind.
 
 This implementation uses the [smolagents](https://huggingface.co/docs/smolagents/index) library for Agentic capabilities, alongside
 of the increasingly Model Context Protocol (MCP) which allows for a standard access communication standard for a large number of tools.
@@ -29,7 +29,7 @@ of the increasingly Model Context Protocol (MCP) which allows for a standard acc
 📘 To explore this project further and discover other Blueprints, visit the [**Blueprints Hub**](https://developer-hub.mozilla.ai/).
 
 ### Built with
-![Python](https://img.shields.io/badge/Python-3.10%2B-blue) 
+![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
 [![smolagents](https://img.shields.io/badge/Smolagents-%F0%9F%A4%97-yellow)](https://huggingface.co/docs/smolagents/index)
 
 
@@ -46,7 +46,7 @@ cd surf-spot-finder
 pip install -e .  # Install root project dependencies
 ```
 
-### 3️⃣ Run 
+### 3️⃣ Run
 
 ```bash
 export OPENAI_API_KEY=yourkeyhere
