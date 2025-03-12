@@ -8,7 +8,7 @@ from surf_spot_finder.config import (
     DEFAULT_PROMPT,
 )
 from surf_spot_finder.agents import RUNNERS
-from surf_spot_finder.tracing import setup_tracing
+from surf_spot_finder.tracing import get_tracer_provider, setup_tracing
 
 
 @logger.catch(reraise=True)
@@ -37,7 +37,10 @@ def find_surf_spot(
     )
 
     logger.info("Setting up tracing")
-    setup_tracing(project_name="surf-spot-finder", json_tracer=config.json_tracer)
+    tracer_provider = get_tracer_provider(
+        project_name="surf-spot-finder", json_tracer=config.json_tracer
+    )
+    setup_tracing(tracer_provider, config.agent_type)
 
     logger.info(f"Running {config.agent_type} agent")
     RUNNERS[config.agent_type](

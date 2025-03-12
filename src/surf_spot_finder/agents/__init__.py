@@ -1,5 +1,5 @@
-from .smolagents import run_smolagents_agent
+from .smolagents import run_smolagent
 
 RUNNERS = {
-    "smolagents": run_smolagents_agent,
+    "smolagents": run_smolagent,
 }
