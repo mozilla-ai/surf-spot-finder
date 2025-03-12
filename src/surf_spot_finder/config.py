@@ -4,7 +4,7 @@ from pydantic import AfterValidator, BaseModel, FutureDatetime, PositiveInt
 
 DEFAULT_PROMPT = (
     "What will be the best surf spot around {LOCATION}"
-    ", in a {MAX_DRIVING_HOURS} driving radius"
+    ", in a {MAX_DRIVING_HOURS} hour driving radius"
     ", at {DATE}? Use your tools to find out what day it currently is, find me the best surf spot and the "
     " up to date weather forecast for that day."
 )
