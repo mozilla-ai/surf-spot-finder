@@ -1,0 +1,1 @@
+git+https://github.com/mozilla-ai/surf-spot-finder.git

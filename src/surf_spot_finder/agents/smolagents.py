@@ -37,12 +37,6 @@ def run_smolagent(
         ToolCollection,
     )
 
-    model = LiteLLMModel(
-        model_id=model_id,
-        api_base=api_base if api_base else None,
-        api_key=os.environ[api_key_var] if api_key_var else None,
-    )
-
     from mcp import StdioServerParameters
 
     model = LiteLLMModel(
