@@ -27,24 +27,24 @@ def evaluate_criterion(
 
     prompt = f"""
     Evaluate if the following {"checkpoint" if evidence else "criterion"} was met {"based on the provided evidence" if evidence else "in the agent's final answer"}.
-    
+
     {"Checkpoint" if evidence else "Criterion"}: {criteria}
     Value: {value}
-    
+
     Expected output: {json.dumps(expected_output)}
-    
+
     Actual final answer: {json.dumps(final_answer)}
     """
 
     if evidence:
         prompt += f"""
-        
+
         Telemetry evidence:
         {evidence}
         """
 
     prompt += f"""
-    
+
     Based on the {"evidence" if evidence else "comparison between the expected output and the actual final answer"},
     was this {"checkpoint" if evidence else "criterion"} satisfied? Answer with:
     1. "passed": true or false

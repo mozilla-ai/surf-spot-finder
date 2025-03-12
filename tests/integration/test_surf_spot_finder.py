@@ -1,5 +1,7 @@
 import json
+import os
 from loguru import logger
+import pytest
 
 from surf_spot_finder.agents.smolagents import run_smolagent
 from surf_spot_finder.config import (
@@ -11,10 +13,10 @@ from .utils import extract_final_answer, verify_checkpoints, verify_final_answer
 from .test_case import sample
 
 
-# @pytest.mark.skipif(
-#     "INTEGRATION_TESTS" not in os.environ or "OPENAI_API_KEY" not in os.environ,
-#     reason="Integration tests require INTEGRATION_TESTS env var and OPENAI_API_KEY to be set"
-# )
+@pytest.mark.skipif(
+    "INTEGRATION_TESTS" not in os.environ or "OPENAI_API_KEY" not in os.environ,
+    reason="Integration tests require INTEGRATION_TESTS env var and OPENAI_API_KEY to be set",
+)
 def test_surf_spot_finder():
     input_data = sample["input"]
     logger.info("Loading config")

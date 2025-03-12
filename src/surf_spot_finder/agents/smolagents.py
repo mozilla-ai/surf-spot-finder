@@ -66,7 +66,7 @@ def run_smolagent(
                 importlib.resources.files("surf_spot_finder.agents.prompts")
                 .joinpath("smolagents.yaml")
                 .read_text()
-            ), # Explicitly pass in the system prompt instead of silently letting smolagents set it for us
+            ),  # Explicitly pass in the system prompt instead of silently letting smolagents set it for us
             model=model,
             add_base_tools=False,  # Turn this on if you want to let it run python code as it sees fit
         )

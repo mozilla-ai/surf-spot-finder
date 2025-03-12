@@ -4,6 +4,7 @@ TODO
 More work is needed to further refine a test case template,
 but this is a starting place
 """
+
 sample = {}
 
 input = {
@@ -33,7 +34,7 @@ checkpoints = [
     {
         "value": 1,
         "criteria": "Check if the agent fetched a website for forecasting, not relying on text from a DuckDuckGo search.",
-    }
+    },
 ]
 
 final_answer_criteria = []
