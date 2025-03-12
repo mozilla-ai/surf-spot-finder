@@ -1,11 +1,14 @@
 from typing import Annotated, Optional
 from pydantic import AfterValidator, BaseModel, FutureDatetime, PositiveInt
+from datetime import datetime
 
+CURRENT_DATE = datetime.now().strftime("%Y-%m-%d")
 
 DEFAULT_PROMPT = (
     "What will be the best surf spot around {LOCATION}"
     ", in a {MAX_DRIVING_HOURS} hour driving radius"
-    ", at {DATE}? Use your tools to find out what day it currently is, find me the best surf spot and the "
+    ", at {DATE}? it is currently " + CURRENT_DATE + 
+    ". find me the best surf spot and the"
     " up to date weather forecast for that day."
 )
 

@@ -34,6 +34,11 @@ tests = [
   "pytest-sugar>=0.9.6",
 ]
 
+# TODO maybe we don't want to keep this, or we want to swap this to Lumigator SDK
+tracing = [
+  "arize-phoenix>=8.12.1",
+]
+
 [project.urls]
 Documentation = "https://mozilla-ai.github.io/surf-spot-finder/"
 Issues = "https://github.com/mozilla-ai/surf-spot-finder/issues"
@@ -48,3 +53,5 @@ namespaces = false
 
 [project.scripts]
 surf-spot-finder = "surf_spot_finder.cli:main"
+# TODO maybe this would be lumigator
+start-phoenix = "phoenix.server.main:main"

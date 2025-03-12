@@ -24,7 +24,7 @@ class JsonFileSpanExporter(SpanExporter):
         pass
 
 
-def setup_tracing(project_name: str, json_tracer: bool = True) -> TracerProvider:
+def setup_tracing(project_name: str, json_tracer: bool) -> TracerProvider:
     """
     Set up tracing configuration based on the selected mode.
 

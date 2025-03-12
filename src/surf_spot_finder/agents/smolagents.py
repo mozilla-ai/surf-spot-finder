@@ -61,8 +61,7 @@ def run_smolagent(model_id: str, prompt: str, api_key_var: Optional[str] = None,
                 DuckDuckGoSearchTool(),
             ],
             model=model,
-            add_base_tools=True,
-            additional_authorized_imports=["json"],
+            add_base_tools=False # Turn this on if you want to let it run python code as it sees fit
         )
         agent.run(prompt)
 
