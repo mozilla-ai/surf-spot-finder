@@ -9,8 +9,10 @@ DEFAULT_PROMPT = (
     ", in a {MAX_DRIVING_HOURS} hour driving radius"
     ", at {DATE}? it is currently "
     + CURRENT_DATE
-    + ". find me the best surf spot and the"
-    " up to date weather forecast for that day."
+    + ". find me the best surf spot and also report back"
+    " on the expected water temperature and wave height."
+    " Please remember that doing a google/duckduckgo search may be useful for finding which sites are relevant,"
+    " but the final answer should be based on information retrieved from https://www.surf-forecast.com."
 )
 
 

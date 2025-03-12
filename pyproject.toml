@@ -32,6 +32,7 @@ docs = [
 tests = [
   "pytest>=8,<9",
   "pytest-sugar>=0.9.6",
+  "debugpy>=1.8.13",
 ]
 
 # TODO maybe we don't want to keep this, or we want to swap this to Lumigator SDK
