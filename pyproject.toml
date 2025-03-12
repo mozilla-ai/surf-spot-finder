@@ -18,6 +18,11 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+openai = [
+  "openai-agents",
+  "openinference-instrumentation-openai"
+]
+
 demo = [
   "gradio",
   "spaces"
