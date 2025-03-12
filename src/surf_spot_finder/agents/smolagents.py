@@ -8,53 +8,62 @@ if TYPE_CHECKING:
 
 
 @logger.catch(reraise=True)
-def load_smolagent(model_id: str, api_key_var: Optional[str]) -> "CodeAgent":
-    """ """
-    from smolagents import (
+def run_smolagent(model_id: str, prompt: str, api_key_var: Optional[str] = None, api_base: Optional[str] = None) -> "CodeAgent":
+    """
+    Create and configure a Smolagents CodeAgent with the specified model.
+    See https://docs.litellm.ai/docs/providers for details on available LiteLLM providers.
+    Args:
+        model_id (str): Model identifier using LiteLLM syntax (e.g., 'openai/o1', 'anthropic/claude-3-sonnet')
+        api_key_var (Optional[str]): Name of environment variable containing the API key
+        api_base (Optional[str]): Custom API base URL, if needed for non-default endpoints
+        
+    Returns:
+        CodeAgent: Configured agent ready to process requests
+        
+    Example:
+        >>> agent = run_smolagent("anthropic/claude-3-haiku", "ANTHROPIC_API_KEY", None, None)
+        >>> agent.run("Find surf spots near San Diego")
+    """
+    from smolagents import ( # pylint: disable=import-outside-toplevel
         CodeAgent,
-        ToolCollection,
         DuckDuckGoSearchTool,
-        VisitWebpageTool,
         LiteLLMModel,
+        ToolCollection,
     )
+
+    model = LiteLLMModel(
+        model_id=model_id,
+        api_base=api_base if api_base else None,
+        api_key=os.environ[api_key_var] if api_key_var else None,
+    )
+
     from mcp import StdioServerParameters
 
     model = LiteLLMModel(
         model_id=model_id,
-        api_key_var=os.environ[api_key_var] if api_key_var else None,
+        api_base=api_base if api_base else None,
+        api_key=os.environ[api_key_var] if api_key_var else None,
     )
 
-    if "GOOGLE_MAPS_API_KEY" in os.environ:
-        # We could easily use any of the MCPs at https://github.com/modelcontextprotocol/servers
-        # or at https://glama.ai/mcp/servers
-        # or at https://smithery.ai/
-        # https://github.com/modelcontextprotocol/servers/tree/main/src/google-maps
-        server_parameters = StdioServerParameters(
-            command="npx",
-            args=["@modelcontextprotocol/server-google-maps"],
-            env={**os.environ},
-        )
-        # https://huggingface.co/docs/smolagents/v1.10.0/en/reference/tools#smolagents.ToolCollection.from_mcp
-        with ToolCollection.from_mcp(server_parameters) as tool_collection:
-            agent = CodeAgent(
-                tools=[
-                    *tool_collection.tools,
-                    DuckDuckGoSearchTool(),
-                    VisitWebpageTool(),
-                ],
-                model=model,
-                add_base_tools=True,
-                additional_authorized_imports=["json"],
-            )
-    else:
-        logger.debug(
-            "GOOGLE_MAPS_api_key_var not set, running without Google Maps tool"
-        )
+    # We could easily use any of the MCPs at https://github.com/modelcontextprotocol/servers
+    # or at https://glama.ai/mcp/servers
+    # or at https://smithery.ai/
+    server_parameters = StdioServerParameters(
+        command="docker",
+        args=["run", "-i", "--rm", "mcp/fetch"],
+        env={**os.environ},
+    )
+    # https://huggingface.co/docs/smolagents/v1.10.0/en/reference/tools#smolagents.ToolCollection.from_mcp
+    with ToolCollection.from_mcp(server_parameters) as tool_collection:
         agent = CodeAgent(
-            tools=[DuckDuckGoSearchTool(), VisitWebpageTool()],
+            tools=[
+                *tool_collection.tools,
+                DuckDuckGoSearchTool(),
+            ],
             model=model,
             add_base_tools=True,
             additional_authorized_imports=["json"],
         )
+        agent.run(prompt)
 
     return agent

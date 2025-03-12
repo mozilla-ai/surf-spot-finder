@@ -47,4 +47,4 @@ namespaces = false
 [tool.setuptools_scm]
 
 [project.scripts]
-find-surf-spot = "surf_spot_finder.cli:main"
+surf-spot-finder = "surf_spot_finder.cli:main"

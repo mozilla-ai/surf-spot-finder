@@ -9,20 +9,49 @@
   </picture>
 </p>
 
-This blueprint guides you to ...
+Many Large Language Model (LLM) capabilities are unlocked when they are given access to tools and given control of their
+own runtime and execution path. However, it's important that as they are given greater capabilities, they are properly
+evaluated and controlled.
+
+In this Blueprint, we demonstrate an AI agent designed for an extremely specific task (some refer to this as a "Vertical Agent")
+that is given the web and searching access it needs to find an answer the same way you would find the answer as a human.
+
+This agent is designed for help in finding the next great surf spot near you: the agent is provided with a location, a distance,
+a timestamp, and it's able to independently search and browse the web to recommend the best spot to you along with the 
+relevant information!
+
+Although this exact use-case may not be useful to you directly, the framework we provide here is intended to be easily 
+adapted to the Agent use case you have in mind. 
+
+This implementation uses the [smolagents](https://huggingface.co/docs/smolagents/index) library for Agentic capabilities, alongside
+of the increasingly Model Context Protocol (MCP) which allows for a standard access communication standard for a large number of tools.
 
 📘 To explore this project further and discover other Blueprints, visit the [**Blueprints Hub**](https://developer-hub.mozilla.ai/).
 
-👉 📖 For more detailed guidance on using this project, please visit our [**Docs here**](https://mozilla-ai.github.io/surf-spot-finder/)
-
 ### Built with
-- Python 3.10+
-- Open-Source Tool 1
-- Open-Source Tool 2
-- ...
+![Python](https://img.shields.io/badge/Python-3.10%2B-blue) 
+[![smolagents](https://img.shields.io/badge/Smolagents-%F0%9F%A4%97-yellow)](https://huggingface.co/docs/smolagents/index)
 
-## Quick-start
 
+## 🚀 Quick Start
+
+### 1️⃣ Clone the Project
+```bash
+git clone https://github.com/mozilla-ai/surf-spot-finder.git
+cd surf-spot-finder
+```
+
+### 2️⃣ Update submodule and install dependencies
+```bash
+pip install -e .  # Install root project dependencies
+```
+
+### 3️⃣ Run 
+
+```bash
+export OPENAI_API_KEY=yourkeyhere
+surf-spot-finder --location="Pittsburgh, PA, USA" --date="Next Wednesday" --max-driving-hours=5 --model-id="openai/o1" --api-key-var="OPENAI_API_KEY"
+```
 
 ## How it Works
 
@@ -36,8 +65,26 @@ This blueprint guides you to ...
   - Disk space:
 
 - **Dependencies**:
+  - Docker
   - Dependencies listed in `pyproject.toml`
 
+## Run Tests
+
+```bash
+pip install -e .[tests]
+```
+
+### Unit Tests
+
+```bash
+pytest
+```
+
+### Integration Tests
+
+```bash
+INTEGRATION_TESTS=Y pytest # Requires docker and OPENAI_API_KEY
+```
 
 ## Troubleshooting
 
