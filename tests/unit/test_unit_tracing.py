@@ -27,7 +27,9 @@ def test_get_tracer_provider(tmp_path, json_tracer):
                 mock_tracer_provider.return_value
             )
         else:
-            mock_register.assert_called_once_with(project_name="test_project")
+            mock_register.assert_called_once_with(
+                project_name="test_project", set_global_tracer_provider=True
+            )
 
 
 def test_invalid_agent_type():

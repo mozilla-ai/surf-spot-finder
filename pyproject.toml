@@ -57,6 +57,11 @@ namespaces = false
 
 [tool.setuptools_scm]
 
+[dependency-groups]
+dev = [
+    "pre-commit>=4.1.0",
+]
+
 [project.scripts]
 surf-spot-finder = "surf_spot_finder.cli:main"
 # TODO maybe this would be lumigator
