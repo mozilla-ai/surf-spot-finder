@@ -23,28 +23,32 @@ class JsonFileSpanExporter(SpanExporter):
         pass
 
 
-def get_tracer_provider(project_name: str, json_tracer: bool) -> TracerProvider:
+def get_tracer_provider(
+    project_name: str, json_tracer: bool, output_dir: str = "telemetry_output"
+) -> TracerProvider:
     """
     Create a tracer_provider based on the selected mode.
 
     Args:
         project_name: Name of the project for tracing
         json_tracer: Whether to use the custom JSON file exporter (True) or Phoenix (False)
+        output_dir: The directory where the telemetry output will be stored.
+            Only used if `json_tracer=True`.
+            Defaults to "telemetry_output".
 
     Returns:
         TracerProvider: The configured tracer provider
     """
     if json_tracer:
-        local_folder: str = "telemetry_output"
-        if not os.path.exists(local_folder):
-            os.makedirs(local_folder)
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
         timestamp = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
 
         tracer_provider = TracerProvider()
         trace.set_tracer_provider(tracer_provider)
 
         json_file_exporter = JsonFileSpanExporter(
-            file_name=f"{local_folder}/{project_name}-{timestamp}.json"
+            file_name=f"{output_dir}/{project_name}-{timestamp}.json"
         )
         span_processor = SimpleSpanProcessor(json_file_exporter)
         tracer_provider.add_span_processor(span_processor)
