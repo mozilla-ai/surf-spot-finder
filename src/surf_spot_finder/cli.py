@@ -1,4 +1,4 @@
-from typing import Literal, Optional
+from typing import Optional
 
 from fire import Fire
 from loguru import logger
@@ -17,7 +17,7 @@ def find_surf_spot(
     date: str,
     max_driving_hours: int,
     model_id: str,
-    agent_type: Literal["smolagents", "openai"] = "smolagents",
+    agent_type: str = "smolagents",
     api_key_var: Optional[str] = None,
     prompt: str = DEFAULT_PROMPT,
     json_tracer: bool = True,

@@ -54,7 +54,19 @@ def get_tracer_provider(project_name: str, json_tracer: bool) -> TracerProvider:
     return tracer_provider
 
 
-def setup_tracing(tracer_provider, agent_type):
+def setup_tracing(tracer_provider: TracerProvider, agent_type: str) -> None:
+    """Setup tracing for `agent_type` by instrumenting `trace_provider`.
+
+    Args:
+        tracer_provider (TracerProvider): The configured tracer provider from
+            [get_tracer_provider][surf_spot_finder.tracing.get_tracer_provider].
+        agent_type (str): The type of agent being used.
+            Must be one of the supported types in [RUNNERS][surf_spot_finder.agents].
+    """
+    from surf_spot_finder.agents import validate_agent_type
+
+    validate_agent_type(agent_type)
+
     if agent_type == "openai":
         from openinference.instrumentation.openai import OpenAIInstrumentor
 
