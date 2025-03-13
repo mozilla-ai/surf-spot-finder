@@ -1,4 +1,5 @@
 import json
+import sys
 from textwrap import dedent
 from typing import Any, Dict, List, Optional
 from loguru import logger
@@ -15,6 +16,10 @@ from surf_spot_finder.evaluation.utils import (
     verify_hypothesis_answer,
 )
 from surf_spot_finder.evaluation.test_case import TestCase
+
+logger.remove()
+logger = logger.opt(ansi=True)
+logger.add(sys.stdout, colorize=True, format="{message}")
 
 
 def run_agent(test_case: TestCase) -> str:
@@ -62,63 +67,58 @@ def evaluate_telemetry(test_case: TestCase, telemetry_path: str) -> bool:
     # Extract the final answer from the telemetry
     hypothesis_answer = extract_hypothesis_answer(telemetry)
     logger.info(
-        dedent(f"""
-                Hypothesis Final answer extracted:
-                - {hypothesis_answer}
-                """)
+        f"""<yellow>Hypothesis Final answer extracted: {hypothesis_answer}</yellow>"""
     )
     # Verify agent behavior against checkpoints using llm-as-a-judge
     llm_judge = "openai/gpt-4o"
     checkpoint_results = verify_checkpoints(
-        telemetry,
-        hypothesis_answer,
-        test_case.checkpoints,
-        test_case.ground_truth,
-        llm_judge,
+        telemetry=telemetry,
+        checkpoints=test_case.checkpoints,
+        model=llm_judge,
     )
 
     hypothesis_answer_results = verify_hypothesis_answer(
-        hypothesis_answer,
-        test_case.ground_truth,
-        test_case.final_answer_criteria,
-        llm_judge,
+        hypothesis_final_answer=hypothesis_answer,
+        ground_truth_answer_dict=test_case.ground_truth,
+        ground_truth_checkpoints=test_case.final_answer_criteria,
+        model=llm_judge,
     )
     # Summarize results
 
     verification_results = checkpoint_results + hypothesis_answer_results
-    all_passed = all(result["passed"] for result in verification_results)
-    failed_checks = [r for r in verification_results if not r["passed"]]
-    passed_checks = [r for r in verification_results if r["passed"]]
+    failed_checks = [r for r in verification_results if not r.passed]
+    passed_checks = [r for r in verification_results if r.passed]
+    missed_points = sum([r.points for r in failed_checks])
+    won_points = sum([r.points for r in passed_checks])
     if passed_checks:
-        logger.info(
-            f"Passed checkpoints: {len(passed_checks)}/{len(verification_results)}"
-        )
         for check in passed_checks:
             message = dedent(
                 f"""
-                Passed:
-                - {check["criteria"]}
-                - {check["reason"]}
-                """
+                <green>Passed:
+                - {check.criteria}
+                - {check.reason}</green>"""
             )
             logger.info(message)
     if failed_checks:
-        logger.error(
-            f"Failed checkpoints: {len(failed_checks)}/{len(verification_results)}"
-        )
         for check in failed_checks:
             message = dedent(
                 f"""
-                Failed:
-                - {check["criteria"]}
-                - {check["reason"]}
-                """
+                <red>Failed:
+                - {check.criteria}
+                - {check.reason}</red>"""
             )
             logger.error(message)
-        else:
-            logger.info("All checkpoints passed!")
-
-    return all_passed
+    else:
+        logger.info("<green>All checkpoints passed!</green>")
+    logger.info(
+        f"<green>Passed checkpoints: {len(passed_checks)}/{len(verification_results)}</green>"
+    )
+    logger.info(
+        f"<red>Failed checkpoints: {len(failed_checks)}/{len(verification_results)}</red>"
+    )
+    logger.info("<green>=====================================</green>")
+    logger.info(f"<green>Score: {won_points}/{won_points + missed_points}</green>")
+    logger.info("<green>=====================================</green>")
 
 
 def evaluate(test_case_path: str, telemetry_path: Optional[str] = None) -> None:
@@ -139,7 +139,7 @@ def evaluate(test_case_path: str, telemetry_path: Optional[str] = None) -> None:
     else:
         logger.info(f"Using provided telemetry file: {telemetry_path}")
         logger.info(
-            "For this to work, the telemetry file must align with the test case."
+            "For this to work, the telemetry file must align with the test case.",
         )
 
     evaluate_telemetry(test_case, telemetry_path)

@@ -3,8 +3,20 @@ from typing import Dict, List, Any, Optional
 import re
 
 from litellm import completion
+from textwrap import dedent
 
+from pydantic import BaseModel, ConfigDict
 from surf_spot_finder.evaluation.test_case import CheckpointCriteria
+
+
+class EvaluationResult(BaseModel):
+    """Represents the result of evaluating a criterion"""
+
+    model_config = ConfigDict(extra="forbid")
+    passed: bool
+    reason: str
+    criteria: str
+    points: int
 
 
 def extract_hypothesis_answer(telemetry: List[Dict[str, Any]]) -> str | None:
@@ -18,47 +30,48 @@ def extract_hypothesis_answer(telemetry: List[Dict[str, Any]]) -> str | None:
 
 def evaluate_criterion(
     criteria: str,
-    value: int,
-    ground_truth_output: List[CheckpointCriteria] | Dict[str, Any],
-    hypothesis_final_answer: str,
     model: str,
+    points: int,
+    ground_truth_output: Optional[List[CheckpointCriteria] | Dict[str, Any]] = None,
+    hypothesis_final_answer: Optional[str] = None,
     evidence: Optional[str] = None,
-) -> Dict[str, Any]:
+) -> EvaluationResult:
     """Evaluate a single criterion using LLM"""
 
-    prompt = f"""
-    Evaluate if the following {"checkpoint" if evidence else "criterion"} was met {"based on the provided evidence" if evidence else "in the agent's answer"}.
+    prompt = dedent(f"""
+    Evaluate if the following criterion was met {"based on the provided evidence" if evidence else "in the agent's answer"}.
 
-    {"Checkpoint" if evidence else "Criterion"}: {criteria}
-    Value: {value}
+    Criterion: {criteria}
+    """)
 
-    Expected output: {json.dumps(ground_truth_output)}
-
-    Agent's  answer: {hypothesis_final_answer}
-    """
+    if ground_truth_output:
+        prompt += dedent(f"""
+        Expected output: {json.dumps(ground_truth_output)}
+        """)
+    if hypothesis_final_answer:
+        prompt += dedent(f"""
+        Agent's  answer: {hypothesis_final_answer}
+        """)
 
     if evidence:
-        prompt += f"""
-
+        prompt += dedent(f"""
         Telemetry evidence:
         {evidence}
-        """
+        """)
 
     prompt += f"""
 
     Based on the {"evidence" if evidence else "comparison between the expected output and the actual final answer"},
-    was this {"checkpoint" if evidence else "criterion"} satisfied? Answer with:
+    was this criterion satisfied? Answer with:
     1. "passed": true or false
     2. "reason": Brief explanation for your decision
-    3. "score": A score from 0 to {value} indicating how well the {"checkpoint" if evidence else "criterion"} was met
     """
     prompt += """
     Output valid JSON with these three fields only, in the format:
     ```json
     {
         "passed": true,
-        "reason": "I have them",
-        "score": 1
+        "reason": "I have them"
     }
     ```
     """
@@ -82,38 +95,35 @@ def evaluate_criterion(
             evaluation = json.loads(content)
 
         evaluation["criteria"] = criteria
-        evaluation["value"] = value
-        return evaluation
     except (json.JSONDecodeError, AttributeError, StopIteration) as e:
-        return {
+        evaluation = {
             "passed": False,
             "reason": f"Failed to evaluate due to parsing: {str(e)} \n Response: {content}",
-            "score": 0,
             "criteria": criteria,
-            "value": value,
         }
+    evaluation["points"] = points
+    return EvaluationResult.model_validate(evaluation)
 
 
 def verify_checkpoints(
     telemetry: List[Dict[str, Any]],
-    hypothesis_final_answer: str,
     checkpoints: List[CheckpointCriteria],
-    ground_truth_checkpoints: List[CheckpointCriteria],
     model: str,
-) -> List[Dict[str, Any]]:
-    """Verify each checkpoint against the telemetry data using LLM"""
+) -> List[EvaluationResult]:
+    """Verify each checkpoint against the telemetry data using LLM
+    These checkpoints do not take the ground truth or hyupothesis
+    answers into account. They are only concerned with the trace and
+    the specific criteria mentioned.
+    """
     results = []
 
     for checkpoint in checkpoints:
         criteria = checkpoint.criteria
-        value = checkpoint.value
         evidence = extract_relevant_evidence(telemetry, criteria)
 
         evaluation = evaluate_criterion(
             criteria=criteria,
-            value=value,
-            ground_truth_output=ground_truth_checkpoints,
-            hypothesis_final_answer=hypothesis_final_answer,
+            points=checkpoint.points,
             model=model,
             evidence=evidence,
         )
@@ -128,19 +138,16 @@ def verify_hypothesis_answer(
     ground_truth_answer_dict: Dict[str, Any],
     ground_truth_checkpoints: List[CheckpointCriteria],
     model: str,
-) -> List[Dict[str, Any]]:
+) -> List[EvaluationResult]:
     """
     Verify if the final answer meets all specified criteria
     """
     results = []
 
     for criterion in ground_truth_checkpoints:
-        criteria = criterion.criteria
-        value = criterion.value
-
         evaluation = evaluate_criterion(
-            criteria=criteria,
-            value=value,
+            criteria=criterion.criteria,
+            points=criterion.points,
             ground_truth_output=ground_truth_answer_dict,
             hypothesis_final_answer=hypothesis_final_answer,
             model=model,
@@ -155,7 +162,8 @@ def extract_relevant_evidence(telemetry: List[Dict[str, Any]], criteria: str) ->
     """Extract relevant telemetry evidence based on the checkpoint criteria
     TODO this is not a very robust implementation, since it requires knowledge about which tools have been
     implemented. We should abstract this so that it can dynamically figure out what tools may have been used
-    and check for them appropriately."""
+    and check for them appropriately. I understand that this tool should probably have some better way of abstracting
+    relevant information from the opentelemetry spans."""
     evidence = ""
 
     # Look for evidence of tool usage
