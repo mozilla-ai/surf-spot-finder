@@ -1,23 +1,18 @@
 import json
-import os
+from textwrap import dedent
 from loguru import logger
-import pytest
 
 from surf_spot_finder.agents.smolagents import run_smolagent
 from surf_spot_finder.config import (
     DEFAULT_PROMPT,
     Config,
 )
-from surf_spot_finder.tracing import setup_tracing
-from .utils import extract_final_answer, verify_checkpoints, verify_final_answer
-from .test_case import sample
+from surf_spot_finder.tracing import get_tracer_provider, setup_tracing
+from surf_spot_finder.evaluation.utils import extract_final_answer, verify_checkpoints, verify_final_answer
+from surf_spot_finder.evaluation.test_case import sample
 
 
-@pytest.mark.skipif(
-    "INTEGRATION_TESTS" not in os.environ or "OPENAI_API_KEY" not in os.environ,
-    reason="Integration tests require INTEGRATION_TESTS env var and OPENAI_API_KEY to be set",
-)
-def test_surf_spot_finder():
+def main():
     input_data = sample["input"]
     logger.info("Loading config")
     config = Config(
@@ -29,14 +24,16 @@ def test_surf_spot_finder():
         prompt=DEFAULT_PROMPT,
         json_tracer=input_data["json_tracer"],
         api_base=input_data["api_base"],
+        agent_type=input_data["agent_type"],
     )
     # project_name is a name + uuid
     project_name = "surf-spot-finder"
 
     logger.info("Setting up tracing")
-    telemetry_path = setup_tracing(
+    tracer_provider, telemetry_path = get_tracer_provider(
         project_name=project_name, json_tracer=config.json_tracer
     )
+    setup_tracing(tracer_provider, agent_type=config.agent_type)
     logger.info("Running agent")
     run_smolagent(
         model_id=config.model_id,
@@ -87,7 +84,17 @@ def test_surf_spot_finder():
             f"Failed checkpoints: {len(failed_checks)}/{len(verification_results)}"
         )
         for check in failed_checks:
-            logger.error(f"Failed: {check['criteria']} - {check['reason']}")
-
+            message = dedent(
+                f"""
+                Failed: 
+                - {check['criteria']}
+                - {check['reason']}
+                """
+            )
+            logger.error(message)
     # Assert that all checkpoints passed
     assert all_passed, f"{len(failed_checks)} checkpoints failed"
+
+
+if __name__ == "__main__":
+    main()

@@ -1,9 +1,7 @@
-import importlib
 import os
 from typing import Optional, TYPE_CHECKING
 
 from loguru import logger
-import yaml
 
 if TYPE_CHECKING:
     from smolagents import CodeAgent
@@ -41,6 +39,7 @@ def run_smolagent(
         ToolCollection,
     )
     from mcp import StdioServerParameters
+    from surf_spot_finder.agents.prompts.smolagents import SYSTEM_PROMPT
 
     model = LiteLLMModel(
         model_id=model_id,
@@ -63,11 +62,7 @@ def run_smolagent(
                 *tool_collection.tools,
                 DuckDuckGoSearchTool(),
             ],
-            prompt_templates=yaml.safe_load(
-                importlib.resources.files("surf_spot_finder.agents.prompts")
-                .joinpath("smolagents.yaml")
-                .read_text()
-            ),  # Explicitly pass in the system prompt instead of silently letting smolagents set it for us
+            prompt_templates={"system_prompt": SYSTEM_PROMPT},
             model=model,
             add_base_tools=False,  # Turn this on if you want to let it run python code as it sees fit
         )

@@ -12,7 +12,7 @@ dependencies = [
   "arize-phoenix>=8.12.1",
   "fire",
   "loguru",
-  "mcp>=1.3.0",
+  "mcp==1.3.0",
   "pydantic",
   "smolagents[litellm,mcp,telemetry]>=1.10.0",
 ]
@@ -64,5 +64,6 @@ dev = [
 
 [project.scripts]
 surf-spot-finder = "surf_spot_finder.cli:main"
+surf-spot-finder-evaluate = "surf_spot_finder.evaluation.evaluate:main"
 # TODO maybe this would be lumigator
 start-phoenix = "phoenix.server.main:main"

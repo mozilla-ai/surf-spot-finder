@@ -15,6 +15,7 @@ input = {
     "api_key_var": "OPENAI_API_KEY",
     "json_tracer": True,
     "api_base": None,
+    "agent_type": "smolagents",
 }
 
 output = {
