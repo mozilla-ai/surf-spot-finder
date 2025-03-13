@@ -18,7 +18,9 @@ def run_smolagent(
 ) -> "CodeAgent":
     """
     Create and configure a Smolagents CodeAgent with the specified model.
+
     See https://docs.litellm.ai/docs/providers for details on available LiteLLM providers.
+
     Args:
         model_id (str): Model identifier using LiteLLM syntax (e.g., 'openai/o1', 'anthropic/claude-3-sonnet')
         prompt (str): Prompt to provide to the model
@@ -38,7 +40,6 @@ def run_smolagent(
         LiteLLMModel,
         ToolCollection,
     )
-
     from mcp import StdioServerParameters
 
     model = LiteLLMModel(

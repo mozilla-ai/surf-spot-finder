@@ -23,12 +23,20 @@ def validate_prompt(value) -> str:
     return value
 
 
+def validate_agent_type(value) -> str:
+    from surf_spot_finder.agents import validate_agent_type
+
+    validate_agent_type(value)
+    return value
+
+
 class Config(BaseModel):
     prompt: Annotated[str, AfterValidator(validate_prompt)]
     location: str
     max_driving_hours: PositiveInt
     date: FutureDatetime
     model_id: str
+    agent_type: Annotated[str, AfterValidator(validate_agent_type)]
     api_key_var: Optional[str] = None
     json_tracer: bool = True
     api_base: Optional[str] = None
