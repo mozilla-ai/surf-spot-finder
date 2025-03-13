@@ -61,7 +61,7 @@ def setup_tracing(tracer_provider: TracerProvider, agent_type: str) -> None:
         tracer_provider (TracerProvider): The configured tracer provider from
             [get_tracer_provider][surf_spot_finder.tracing.get_tracer_provider].
         agent_type (str): The type of agent being used.
-            Must be one of the supported types in [RUNNERS][surf_spot_finder.agents].
+            Must be one of the supported types in [RUNNERS][surf_spot_finder.agents.RUNNERS].
     """
     from surf_spot_finder.agents import validate_agent_type
 
