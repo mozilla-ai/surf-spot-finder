@@ -4,36 +4,37 @@ import re
 
 from litellm import completion
 
+from surf_spot_finder.evaluation.test_case import CheckpointCriteria
 
-def extract_final_answer(telemetry: List[Dict[str, Any]]) -> Dict[str, Any]:
-    """Extract the final answer from the telemetry data"""
-    # Look for FinalAnswerTool spans
+
+def extract_hypothesis_answer(telemetry: List[Dict[str, Any]]) -> str | None:
+    """Extract the hypothesis agent final answer from the telemetry data"""
     for span in reversed(telemetry):
         if span.get("attributes", {}).get("openinference.span.kind") == "AGENT":
-            final_answer = span.get("attributes", {}).get("output.value")
-            return final_answer
+            hypo = span.get("attributes", {}).get("output.value")
+            return hypo
     raise ValueError("Final answer not found in telemetry")
 
 
 def evaluate_criterion(
     criteria: str,
     value: int,
-    expected_output: Dict[str, Any],
-    final_answer: Dict[str, Any],
+    ground_truth_output: List[CheckpointCriteria] | Dict[str, Any],
+    hypothesis_final_answer: str,
     model: str,
     evidence: Optional[str] = None,
 ) -> Dict[str, Any]:
     """Evaluate a single criterion using LLM"""
 
     prompt = f"""
-    Evaluate if the following {"checkpoint" if evidence else "criterion"} was met {"based on the provided evidence" if evidence else "in the agent's final answer"}.
+    Evaluate if the following {"checkpoint" if evidence else "criterion"} was met {"based on the provided evidence" if evidence else "in the agent's answer"}.
 
     {"Checkpoint" if evidence else "Criterion"}: {criteria}
     Value: {value}
 
-    Expected output: {json.dumps(expected_output)}
+    Expected output: {json.dumps(ground_truth_output)}
 
-    Actual final answer: {json.dumps(final_answer)}
+    Agent's  answer: {hypothesis_final_answer}
     """
 
     if evidence:
@@ -64,9 +65,8 @@ def evaluate_criterion(
 
     response = completion(model=model, messages=[{"role": "user", "content": prompt}])
 
+    content = response.choices[0].message.content
     try:
-        content = response.choices[0].message.content
-
         # Extract JSON from the response - looks for patterns like ```json {...} ``` or just {...}
         # Claude helped me with this one, regex is hard
         json_match = re.search(
@@ -87,7 +87,7 @@ def evaluate_criterion(
     except (json.JSONDecodeError, AttributeError, StopIteration) as e:
         return {
             "passed": False,
-            "reason": f"Failed to evaluate: {str(e)}",
+            "reason": f"Failed to evaluate due to parsing: {str(e)} \n Response: {content}",
             "score": 0,
             "criteria": criteria,
             "value": value,
@@ -96,24 +96,24 @@ def evaluate_criterion(
 
 def verify_checkpoints(
     telemetry: List[Dict[str, Any]],
-    final_answer: Dict[str, Any],
-    checkpoints: List[Dict[str, Any]],
-    expected_output: Dict[str, Any],
+    hypothesis_final_answer: str,
+    checkpoints: List[CheckpointCriteria],
+    ground_truth_checkpoints: List[CheckpointCriteria],
     model: str,
 ) -> List[Dict[str, Any]]:
     """Verify each checkpoint against the telemetry data using LLM"""
     results = []
 
     for checkpoint in checkpoints:
-        criteria = checkpoint["criteria"]
-        value = checkpoint["value"]
+        criteria = checkpoint.criteria
+        value = checkpoint.value
         evidence = extract_relevant_evidence(telemetry, criteria)
 
         evaluation = evaluate_criterion(
             criteria=criteria,
             value=value,
-            expected_output=expected_output,
-            final_answer=final_answer,
+            ground_truth_output=ground_truth_checkpoints,
+            hypothesis_final_answer=hypothesis_final_answer,
             model=model,
             evidence=evidence,
         )
@@ -123,10 +123,10 @@ def verify_checkpoints(
     return results
 
 
-def verify_final_answer(
-    final_answer: Dict[str, Any],
-    expected_output: Dict[str, Any],
-    criteria_list: List[Dict[str, Any]],
+def verify_hypothesis_answer(
+    hypothesis_final_answer: str,
+    ground_truth_answer_dict: Dict[str, Any],
+    ground_truth_checkpoints: List[CheckpointCriteria],
     model: str,
 ) -> List[Dict[str, Any]]:
     """
@@ -134,15 +134,15 @@ def verify_final_answer(
     """
     results = []
 
-    for criterion in criteria_list:
-        criteria = criterion["criteria"]
-        value = criterion["value"]
+    for criterion in ground_truth_checkpoints:
+        criteria = criterion.criteria
+        value = criterion.value
 
         evaluation = evaluate_criterion(
             criteria=criteria,
             value=value,
-            expected_output=expected_output,
-            final_answer=final_answer,
+            ground_truth_output=ground_truth_answer_dict,
+            hypothesis_final_answer=hypothesis_final_answer,
             model=model,
         )
 

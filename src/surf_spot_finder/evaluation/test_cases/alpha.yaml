@@ -1,0 +1,22 @@
+# Test case for surf spot finder
+input:
+  location: "Vigo"
+  date: "2025-03-15 22:00"
+  max_driving_hours: 3
+  model_id: "openai/gpt-4o"
+  api_key_var: "OPENAI_API_KEY"
+  json_tracer: true
+  api_base: null
+  agent_type: "smolagents"
+
+ground_truth:
+  "Surf location": "Playa de Patos"
+  "Water temperature": "about 14°C +-5°C"
+  "Wave height": "about 1 meter"
+
+# Base checkpoints for agent behavior
+checkpoints:
+  - value: 1
+    criteria: "Check if the agent consulted DuckDuckGoSearchTool for locations near Vigo."
+  - value: 1
+    criteria: "Check if the agent fetched a website for forecasting, not relying on text from a DuckDuckGo search."
