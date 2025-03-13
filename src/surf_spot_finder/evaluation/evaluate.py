@@ -8,7 +8,11 @@ from surf_spot_finder.config import (
     Config,
 )
 from surf_spot_finder.tracing import get_tracer_provider, setup_tracing
-from surf_spot_finder.evaluation.utils import extract_final_answer, verify_checkpoints, verify_final_answer
+from surf_spot_finder.evaluation.utils import (
+    extract_final_answer,
+    verify_checkpoints,
+    verify_final_answer,
+)
 from surf_spot_finder.evaluation.test_case import sample
 
 
@@ -86,7 +90,7 @@ def main():
         for check in failed_checks:
             message = dedent(
                 f"""
-                Failed: 
+                Failed:
                 - {check['criteria']}
                 - {check['reason']}
                 """
