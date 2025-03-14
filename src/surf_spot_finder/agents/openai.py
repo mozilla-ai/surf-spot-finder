@@ -47,8 +47,29 @@ def run_openai_agent(
         AsyncOpenAI,
         OpenAIChatCompletionsModel,
         Runner,
-        WebSearchTool,
+        function_tool,
     )
+    from smolagents import DuckDuckGoSearchTool, VisitWebpageTool
+
+    @function_tool
+    def search_web(query: str) -> str:
+        """Performs a duckduckgo web search based on your query (think a Google search) then returns the top search results.
+
+        Args:
+            query: The search query to perform.
+        """
+        search_tool = DuckDuckGoSearchTool()
+        return search_tool.forward(query)
+
+    @function_tool
+    def visit_webpage(url: str) -> str:
+        """Visits a webpage at the given url and reads its content as a markdown string. Use this to browse webpages.
+
+        Args:
+            url: The url of the webpage to visit.
+        """
+        visit_tool = VisitWebpageTool()
+        return visit_tool.forward(url)
 
     if api_key_var and base_url:
         external_client = AsyncOpenAI(
@@ -62,14 +83,14 @@ def run_openai_agent(
                 model=model_id,
                 openai_client=external_client,
             ),
-            tools=[WebSearchTool()],
+            tools=[search_web, visit_webpage],
         )
     else:
         agent = Agent(
             model=model_id,
             instructions=instructions,
             name=name,
-            tools=[WebSearchTool()],
+            tools=[search_web, visit_webpage],
         )
     result = Runner.run_sync(agent, prompt)
     logger.info(result.final_output)
