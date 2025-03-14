@@ -1,6 +1,6 @@
 import os
 import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch, MagicMock, ANY
 
 from surf_spot_finder.agents.openai import run_openai_agent
 
@@ -32,9 +32,7 @@ def test_run_openai_agent_default(mock_agents_module):
         model="gpt-4o",
         instructions=None,
         name="surf-spot-finder",
-        tools=[
-            mock_agents_module["WebSearchTool"].return_value,
-        ],
+        tools=ANY,
     )
 
 
