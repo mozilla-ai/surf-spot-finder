@@ -95,7 +95,7 @@ def setup_tracing(tracer_provider: TracerProvider, agent_type: str) -> None:
 
     validate_agent_type(agent_type)
 
-    if agent_type == "openai":
+    if "openai" in agent_type:
         from openinference.instrumentation.openai import OpenAIInstrumentor
 
         OpenAIInstrumentor().instrument(tracer_provider=tracer_provider)

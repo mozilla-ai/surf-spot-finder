@@ -32,6 +32,20 @@ def test_get_tracer_provider(tmp_path, json_tracer):
             )
 
 
+@pytest.mark.parametrize(
+    "agent_type,instrumentor",
+    [
+        ("openai", "openai.OpenAIInstrumentor"),
+        ("openai_multi_agent", "openai.OpenAIInstrumentor"),
+        ("smolagents", "smolagents.SmolagentsInstrumentor"),
+    ],
+)
+def test_setup_tracing(agent_type, instrumentor):
+    with patch(f"openinference.instrumentation.{instrumentor}") as mock_instrumentor:
+        setup_tracing(MagicMock(), agent_type)
+        mock_instrumentor.assert_called_once()
+
+
 def test_invalid_agent_type():
     with pytest.raises(ValueError, match="agent_type must be one of"):
         setup_tracing(MagicMock(), "invalid_agent_type")
