@@ -128,13 +128,15 @@ def run_openai_agent(
 
 DEFAULT_MULTIAGENT_INSTRUCTIONS = """
 You will be asked to perform a task.
+
 Always follow this steps:
 
-First, look at the available agent/tools and plan a sequence of actions using the available tools.
-Second, show the plan to the user and ask for verification. If it is not satisfactory, come up with a better plan.
-Third, execute the plan until you get a final answer.
+First, before solving the task, look at the available agent/tools and plan a sequence of actions using the available tools.
+Second, show the plan of actions to the user and ask for verification. If it is not satisfactory, come up with a better plan.
+Third, execute the plan using the available tools, until you get a final answer.
 
-Once you get a final answer, show the answer and ask the user for verification. If it is not satisfactory, come up with a better answer.
+Once you get a final answer, show the answer to the user and ask for verification. If it is not satisfactory, come up with a better answer.
+
 Finally, use the available handoff tool (`transfer_to_<agent_name>`) to communicate it to the user.
 """
 
@@ -175,7 +177,7 @@ def run_openai_multi_agent(
 
     search_web_agent = Agent(
         model=model_id,
-        instructions="Find relevant information in the web by combining searches and visiting pages.",
+        instructions="Find relevant information about the provided task by combining web searches with visiting webpages.",
         name="search-web-agent",
         tools=[search_web, visit_webpage],
     )
@@ -195,11 +197,11 @@ def run_openai_multi_agent(
         tools=[
             search_web_agent.as_tool(
                 tool_name="search_web",
-                tool_description="Search and visit websites to find information about the provided task.",
+                tool_description=search_web_agent.instructions,
             ),
             user_verification_agent.as_tool(
                 tool_name="user_verification",
-                tool_description="Show the final answer to the task to the user and verify the satisfaction.",
+                tool_description=user_verification_agent.instructions,
             ),
         ],
     )
