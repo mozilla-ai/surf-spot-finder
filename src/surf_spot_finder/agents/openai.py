@@ -13,7 +13,6 @@ from loguru import logger
 from smolagents import (
     DuckDuckGoSearchTool,
     VisitWebpageTool,
-    UserInputTool,
     FinalAnswerTool,
 )
 
@@ -55,15 +54,14 @@ def final_answer(answer: str) -> str:
 
 
 @function_tool
-def user_input(query: str) -> str:
-    """Asks for user's input when needed to verify.
+def user_verification(query: str) -> str:
+    """Asks user to verify the given `query`.
 
     Args:
-        query: The question to ask the user
+        query: The question that requires verification.
     """
-    logger.debug("Calling user_input")
-    user_input_tool = UserInputTool()
-    return user_input_tool.forward(query)
+    logger.debug("Calling user_verification")
+    return input(f"{query} => Type your answer here:")
 
 
 @logger.catch(reraise=True)
@@ -128,14 +126,25 @@ def run_openai_agent(
     return result
 
 
+DEFAULT_MULTIAGENT_INSTRUCTIONS = """
+You will be asked to perform a task.
+Always follow this steps:
+
+First, look at the available agent/tools and plan a sequence of actions using the available tools.
+Second, show the plan to the user and ask for verification. If it is not satisfactory, come up with a better plan.
+Third, execute the plan until you get a final answer.
+
+Once you get a final answer, show the answer and ask the user for verification. If it is not satisfactory, come up with a better answer.
+Finally, use the available handoff tool (`transfer_to_<agent_name>`) to communicate it to the user.
+"""
+
+
 @logger.catch(reraise=True)
 def run_openai_multi_agent(
     model_id: str,
     prompt: str,
     name: str = "surf-spot-finder",
-    instructions: Optional[
-        str
-    ] = "You will be asked to perform a task. First, search for information to answer the task. Then, elaborate an answer and verify with the user if it is satisfactory or not. If the user is not satisfied, try to find a better answer. Once you have found a satisfactory answer, communicate it to the user.",
+    instructions: Optional[str] = DEFAULT_MULTIAGENT_INSTRUCTIONS,
 ) -> RunResult:
     """Runs multiple OpenAI agents using agents as tools with the given prompt and configuration.
 
@@ -159,14 +168,14 @@ def run_openai_multi_agent(
     """
     user_verification_agent = Agent(
         model=model_id,
-        instructions=None,
+        instructions="Display the current output to the user, then ask for verification.",
         name="user-verification-agent",
-        tools=[user_input],
+        tools=[user_verification],
     )
 
     search_web_agent = Agent(
         model=model_id,
-        instructions=None,
+        instructions="Find relevant information in the web by combining searches and visiting pages.",
         name="search-web-agent",
         tools=[search_web, visit_webpage],
     )
@@ -182,18 +191,15 @@ def run_openai_multi_agent(
         model=model_id,
         instructions=instructions,
         name=name,
+        handoffs=[communication_agent],
         tools=[
             search_web_agent.as_tool(
                 tool_name="search_web",
-                tool_description="Find information on the web about the provided task.",
+                tool_description="Search and visit websites to find information about the provided task.",
             ),
             user_verification_agent.as_tool(
                 tool_name="user_verification",
-                tool_description="Show the answer to the task to the user and verify the satisfaction.",
-            ),
-            communication_agent.as_tool(
-                tool_name="communication",
-                tool_description="Communicate the verified answer to the user.",
+                tool_description="Show the final answer to the task to the user and verify the satisfaction.",
             ),
         ],
     )
