@@ -148,7 +148,7 @@ def run_openai_multi_agent(
     name: str = "surf-spot-finder",
     instructions: Optional[str] = DEFAULT_MULTIAGENT_INSTRUCTIONS,
 ) -> RunResult:
-    """Runs multiple OpenAI agents using agents as tools with the given prompt and configuration.
+    """Runs multiple OpenAI agents orchestrated by a main agent.
 
     It leverages the 'agents' library to create and manage the agent
     execution.
@@ -160,9 +160,9 @@ def run_openai_multi_agent(
         model_id (str): The ID of the OpenAI model to use (e.g., "gpt4o").
             See https://platform.openai.com/docs/api-reference/models.
         prompt (str): The prompt to be given to the agent.
-        name (str, optional): The name of the agent. Defaults to "surf-spot-finder".
+        name (str, optional): The name of the main agent. Defaults to "surf-spot-finder".
         instructions (Optional[str], optional): Initial instructions to give the agent.
-            Defaults to None.
+            Defaults to [DEFAULT_MULTIAGENT_INSTRUCTIONS][surf_spot_finder.agents.openai.DEFAULT_MULTIAGENT_INSTRUCTIONS].
 
     Returns:
         RunResult: A RunResult object containing the output of the agent run.

@@ -6,6 +6,8 @@
 
 ::: surf_spot_finder.agents.openai
 
+::: surf_spot_finder.agents.openai.DEFAULT_MULTIAGENT_INSTRUCTIONS
+
 ::: surf_spot_finder.agents.smolagents
 
 ::: surf_spot_finder.tracing
