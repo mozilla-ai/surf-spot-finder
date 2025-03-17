@@ -25,7 +25,11 @@ def mock_agents_module():
 
 
 def test_run_openai_agent_default(mock_agents_module):
-    from surf_spot_finder.agents.openai import run_openai_agent, search_web, visit_webpage
+    from surf_spot_finder.agents.openai import (
+        run_openai_agent,
+        search_web,
+        visit_webpage,
+    )
 
     run_openai_agent("gpt-4o", "Test prompt")
     mock_agents_module["Agent"].assert_called_once_with(

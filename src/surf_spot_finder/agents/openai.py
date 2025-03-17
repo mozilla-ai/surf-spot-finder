@@ -135,7 +135,7 @@ def run_openai_multi_agent(
     name: str = "surf-spot-finder",
     instructions: Optional[
         str
-    ] = "You will be asked to perform a task. First, use the provided tools to find an answer for the task. Then, verify with the user if the answer is satisfactory or not. If the user is not satisfied, try to find a better answer.",
+    ] = "You will be asked to perform a task. First, search for information to answer the task. Then, elaborate an answer and verify with the user if it is satisfactory or not. If the user is not satisfied, try to find a better answer. Once you have found a satisfactory answer, communicate it to the user.",
 ) -> RunResult:
     """Runs multiple OpenAI agents using agents as tools with the given prompt and configuration.
 
@@ -159,16 +159,23 @@ def run_openai_multi_agent(
     """
     user_verification_agent = Agent(
         model=model_id,
-        instructions=instructions,
+        instructions=None,
         name="user-verification-agent",
         tools=[user_input],
     )
 
     search_web_agent = Agent(
         model=model_id,
-        instructions=instructions,
+        instructions=None,
         name="search-web-agent",
         tools=[search_web, visit_webpage],
+    )
+
+    communication_agent = Agent(
+        model=model_id,
+        instructions=None,
+        name="communication-agent",
+        tools=[final_answer],
     )
 
     main_agent = Agent(
@@ -177,13 +184,17 @@ def run_openai_multi_agent(
         name=name,
         tools=[
             search_web_agent.as_tool(
-                tool_name="search_web", tool_description="Find information on the web."
+                tool_name="search_web",
+                tool_description="Find information on the web about the provided task.",
             ),
             user_verification_agent.as_tool(
                 tool_name="user_verification",
-                tool_description="Show the answer to the user and verify the satisfaction.",
+                tool_description="Show the answer to the task to the user and verify the satisfaction.",
             ),
-            final_answer,
+            communication_agent.as_tool(
+                tool_name="communication",
+                tool_description="Communicate the verified answer to the user.",
+            ),
         ],
     )
 
