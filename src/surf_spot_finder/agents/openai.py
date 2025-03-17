@@ -132,10 +132,10 @@ You will be asked to perform a task.
 Always follow this steps:
 
 First, before solving the task, look at the available agent/tools and plan a sequence of actions using the available tools.
-Second, show the plan of actions to the user and ask for verification. If it is not satisfactory, come up with a better plan.
+Second, show the plan of actions and ask for user verification. If the user does not verify the plan, come up with a better plan.
 Third, execute the plan using the available tools, until you get a final answer.
 
-Once you get a final answer, show the answer to the user and ask for verification. If it is not satisfactory, come up with a better answer.
+Once you get a final answer, show it and ask for user verification.  If the user does not verify the answer, come up with a better answer.
 
 Finally, use the available handoff tool (`transfer_to_<agent_name>`) to communicate it to the user.
 """
@@ -196,11 +196,11 @@ def run_openai_multi_agent(
         handoffs=[communication_agent],
         tools=[
             search_web_agent.as_tool(
-                tool_name="search_web",
+                tool_name="search_web_with_agent",
                 tool_description=search_web_agent.instructions,
             ),
             user_verification_agent.as_tool(
-                tool_name="user_verification",
+                tool_name="ask_user_verification_with_agent",
                 tool_description=user_verification_agent.instructions,
             ),
         ],
