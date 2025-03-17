@@ -1,8 +1,6 @@
 import os
 import pytest
-from unittest.mock import patch, MagicMock, ANY
-
-from surf_spot_finder.agents.openai import run_openai_agent
+from unittest.mock import patch, MagicMock
 
 
 @pytest.fixture
@@ -27,16 +25,20 @@ def mock_agents_module():
 
 
 def test_run_openai_agent_default(mock_agents_module):
+    from surf_spot_finder.agents.openai import run_openai_agent, search_web, visit_webpage
+
     run_openai_agent("gpt-4o", "Test prompt")
     mock_agents_module["Agent"].assert_called_once_with(
         model="gpt-4o",
         instructions=None,
         name="surf-spot-finder",
-        tools=ANY,
+        tools=[search_web, visit_webpage],
     )
 
 
 def test_run_openai_agent_base_url_and_api_key_var(mock_agents_module):
+    from surf_spot_finder.agents.openai import run_openai_agent
+
     with patch.dict(os.environ, {"TEST_API_KEY": "test-key-12345"}):
         run_openai_agent(
             "gpt-4o", "Test prompt", base_url="FOO", api_key_var="TEST_API_KEY"
@@ -48,8 +50,10 @@ def test_run_openai_agent_base_url_and_api_key_var(mock_agents_module):
         mock_agents_module["OpenAIChatCompletionsModel"].assert_called_once()
 
 
-def test_run_smolagent_environment_error():
+def test_run_openai_environment_error():
     """Test that passing a bad api_key_var throws an error"""
+    from surf_spot_finder.agents.openai import run_openai_agent
+
     with patch.dict(os.environ, {}, clear=True):
         with pytest.raises(KeyError, match="MISSING_KEY"):
             run_openai_agent(
