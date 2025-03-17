@@ -1,10 +1,69 @@
 import os
-from typing import Optional, TYPE_CHECKING
+from typing import Optional
 
+from agents import (
+    Agent,
+    AsyncOpenAI,
+    OpenAIChatCompletionsModel,
+    Runner,
+    RunResult,
+    function_tool,
+)
 from loguru import logger
+from smolagents import (
+    DuckDuckGoSearchTool,
+    VisitWebpageTool,
+    UserInputTool,
+    FinalAnswerTool,
+)
 
-if TYPE_CHECKING:
-    from agents import RunResult
+
+@function_tool
+def search_web(query: str) -> str:
+    """Performs a duckduckgo web search based on your query (think a Google search) then returns the top search results.
+
+    Args:
+        query: The search query to perform.
+    """
+    logger.debug(f"Calling search_web: {query}")
+    search_tool = DuckDuckGoSearchTool()
+    return search_tool.forward(query)
+
+
+@function_tool
+def visit_webpage(url: str) -> str:
+    """Visits a webpage at the given url and reads its content as a markdown string. Use this to browse webpages.
+
+    Args:
+        url: The url of the webpage to visit.
+    """
+    logger.debug(f"Calling visit_webpage: {url}")
+    visit_tool = VisitWebpageTool()
+    return visit_tool.forward(url)
+
+
+@function_tool
+def final_answer(answer: str) -> str:
+    """Provides a final answer to the given problem.
+
+    Args:
+        answer: The answer to the problem.
+    """
+    logger.debug("Calling final_answer")
+    final_answer_tool = FinalAnswerTool()
+    return final_answer_tool.forward(answer)
+
+
+@function_tool
+def user_input(query: str) -> str:
+    """Asks for user's input when needed to verify.
+
+    Args:
+        query: The question to ask the user
+    """
+    logger.debug("Calling user_input")
+    user_input_tool = UserInputTool()
+    return user_input_tool.forward(query)
 
 
 @logger.catch(reraise=True)
@@ -15,7 +74,7 @@ def run_openai_agent(
     instructions: Optional[str] = None,
     api_key_var: Optional[str] = None,
     base_url: Optional[str] = None,
-) -> "RunResult":
+) -> RunResult:
     """Runs an OpenAI agent with the given prompt and configuration.
 
     It leverages the 'agents' library to create and manage the agent
@@ -42,34 +101,6 @@ def run_openai_agent(
         RunResult: A RunResult object containing the output of the agent run.
             See https://openai.github.io/openai-agents-python/ref/result/#agents.result.RunResult.
     """
-    from agents import (
-        Agent,
-        AsyncOpenAI,
-        OpenAIChatCompletionsModel,
-        Runner,
-        function_tool,
-    )
-    from smolagents import DuckDuckGoSearchTool, VisitWebpageTool
-
-    @function_tool
-    def search_web(query: str) -> str:
-        """Performs a duckduckgo web search based on your query (think a Google search) then returns the top search results.
-
-        Args:
-            query: The search query to perform.
-        """
-        search_tool = DuckDuckGoSearchTool()
-        return search_tool.forward(query)
-
-    @function_tool
-    def visit_webpage(url: str) -> str:
-        """Visits a webpage at the given url and reads its content as a markdown string. Use this to browse webpages.
-
-        Args:
-            url: The url of the webpage to visit.
-        """
-        visit_tool = VisitWebpageTool()
-        return visit_tool.forward(url)
 
     if api_key_var and base_url:
         external_client = AsyncOpenAI(
@@ -93,5 +124,69 @@ def run_openai_agent(
             tools=[search_web, visit_webpage],
         )
     result = Runner.run_sync(agent, prompt)
+    logger.info(result.final_output)
+    return result
+
+
+@logger.catch(reraise=True)
+def run_openai_multi_agent(
+    model_id: str,
+    prompt: str,
+    name: str = "surf-spot-finder",
+    instructions: Optional[
+        str
+    ] = "You will be asked to perform a task. First, use the provided tools to find an answer for the task. Then, verify with the user if the answer is satisfactory or not. If the user is not satisfied, try to find a better answer.",
+) -> RunResult:
+    """Runs multiple OpenAI agents using agents as tools with the given prompt and configuration.
+
+    It leverages the 'agents' library to create and manage the agent
+    execution.
+
+    See https://openai.github.io/openai-agents-python/ref/agent/ for more details.
+
+
+    Args:
+        model_id (str): The ID of the OpenAI model to use (e.g., "gpt4o").
+            See https://platform.openai.com/docs/api-reference/models.
+        prompt (str): The prompt to be given to the agent.
+        name (str, optional): The name of the agent. Defaults to "surf-spot-finder".
+        instructions (Optional[str], optional): Initial instructions to give the agent.
+            Defaults to None.
+
+    Returns:
+        RunResult: A RunResult object containing the output of the agent run.
+            See https://openai.github.io/openai-agents-python/ref/result/#agents.result.RunResult.
+    """
+    user_verification_agent = Agent(
+        model=model_id,
+        instructions=instructions,
+        name="user-verification-agent",
+        tools=[user_input],
+    )
+
+    search_web_agent = Agent(
+        model=model_id,
+        instructions=instructions,
+        name="search-web-agent",
+        tools=[search_web, visit_webpage],
+    )
+
+    main_agent = Agent(
+        model=model_id,
+        instructions=instructions,
+        name=name,
+        tools=[
+            search_web_agent.as_tool(
+                tool_name="search_web", tool_description="Find information on the web."
+            ),
+            user_verification_agent.as_tool(
+                tool_name="user_verification",
+                tool_description="Show the answer to the user and verify the satisfaction.",
+            ),
+            final_answer,
+        ],
+    )
+
+    result = Runner.run_sync(main_agent, prompt)
     logger.info(result.final_output)
     return result
