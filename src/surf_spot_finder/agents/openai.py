@@ -21,6 +21,18 @@ from surf_spot_finder.prompts.openai import (
     SINGLE_AGENT_SYSTEM_PROMPT,
     MULTI_AGENT_SYSTEM_PROMPT,
 )
+from surf_spot_finder.tools.openmeteo import get_wave_forecast, get_wind_forecast
+from surf_spot_finder.tools.openstreetmap import (
+    driving_hours_to_meters,
+    get_area_lat_lon,
+    get_surfing_places,
+)
+
+driving_hours_to_meters = function_tool(driving_hours_to_meters)
+get_area_lat_lon = function_tool(get_area_lat_lon)
+get_surfing_places = function_tool(get_surfing_places)
+get_wave_forecast = function_tool(get_wave_forecast)
+get_wind_forecast = function_tool(get_wind_forecast)
 
 
 @function_tool
@@ -125,7 +137,15 @@ def run_openai_agent(
             model=model_id,
             instructions=instructions,
             name=name,
-            tools=[search_web, visit_webpage],
+            tools=[
+                search_web,
+                visit_webpage,
+                get_area_lat_lon,
+                get_surfing_places,
+                get_wave_forecast,
+                get_wind_forecast,
+                driving_hours_to_meters,
+            ],
         )
     result = Runner.run_sync(agent, prompt)
     logger.info(result.final_output)

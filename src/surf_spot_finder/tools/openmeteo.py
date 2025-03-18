@@ -72,7 +72,7 @@ def get_wave_forecast(lat: float, lon: float, date: str | None = None) -> list[d
     return hourly_data
 
 
-def get_wind_forecast(lat, lon, date: str | None = None) -> list[dict]:
+def get_wind_forecast(lat: float, lon: float, date: str | None = None) -> list[dict]:
     """Get wind forecast for given location.
 
     Forecast will include:

@@ -3,6 +3,8 @@ You will be asked to perform a task.
 
 Before solving the task, plan a sequence of actions using the available tools.
 Then, execute the sequence of actions using the tools.
+
+Prefer to use task-specific tools before relying on generic tools like web search.
 """.strip()
 
 MULTI_AGENT_SYSTEM_PROMPT = """
