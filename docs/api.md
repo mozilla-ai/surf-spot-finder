@@ -10,10 +10,13 @@
 
 ::: surf_spot_finder.agents.smolagents
 
+::: surf_spot_finder.tools.openmeteo
+::: surf_spot_finder.tools.openstreetmap
+
+::: surf_spot_finder.tracing
+
 ::: surf_spot_finder.prompts.openai.SINGLE_AGENT_SYSTEM_PROMPT
 
 ::: surf_spot_finder.prompts.openai.MULTI_AGENT_SYSTEM_PROMPT
 
 ::: surf_spot_finder.prompts.shared.INPUT_PROMPT
-
-::: surf_spot_finder.tracing
