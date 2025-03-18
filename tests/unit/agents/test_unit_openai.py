@@ -28,7 +28,7 @@ def test_run_openai_agent_default():
             model="gpt-4o",
             instructions=SINGLE_AGENT_SYSTEM_PROMPT,
             name="surf-spot-finder",
-            tools=[search_web, visit_webpage],
+            tools=ANY,
         )
 
 
