@@ -1,10 +1,16 @@
 import os
-from typing import Optional, TYPE_CHECKING
+from typing import Optional
 
 from loguru import logger
 
-if TYPE_CHECKING:
-    from smolagents import CodeAgent
+from smolagents import (
+    CodeAgent,
+    DuckDuckGoSearchTool,
+    LiteLLMModel,
+    ToolCollection,
+)
+from mcp import StdioServerParameters
+from surf_spot_finder.prompts.smolagents import SYSTEM_PROMPT
 
 
 @logger.catch(reraise=True)
@@ -13,7 +19,7 @@ def run_smolagent(
     prompt: str,
     api_key_var: Optional[str] = None,
     api_base: Optional[str] = None,
-) -> "CodeAgent":
+) -> CodeAgent:
     """
     Create and configure a Smolagents CodeAgent with the specified model.
 
@@ -29,17 +35,10 @@ def run_smolagent(
         CodeAgent: Configured agent ready to process requests
 
     Example:
+
         >>> agent = run_smolagent("anthropic/claude-3-haiku", "my prompt here", "ANTHROPIC_API_KEY", None, None)
         >>> agent.run("Find surf spots near San Diego")
     """
-    from smolagents import (  # pylint: disable=import-outside-toplevel
-        CodeAgent,
-        DuckDuckGoSearchTool,
-        LiteLLMModel,
-        ToolCollection,
-    )
-    from mcp import StdioServerParameters
-    from surf_spot_finder.agents.prompts.smolagents import SYSTEM_PROMPT
 
     model = LiteLLMModel(
         model_id=model_id,

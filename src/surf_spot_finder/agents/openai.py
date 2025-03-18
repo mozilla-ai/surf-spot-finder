@@ -17,6 +17,12 @@ from smolagents import (
 )
 
 
+from surf_spot_finder.prompts.openai import (
+    SINGLE_AGENT_SYSTEM_PROMPT,
+    MULTI_AGENT_SYSTEM_PROMPT,
+)
+
+
 @function_tool
 def search_web(query: str) -> str:
     """Performs a duckduckgo web search based on your query (think a Google search) then returns the top search results.
@@ -69,7 +75,7 @@ def run_openai_agent(
     model_id: str,
     prompt: str,
     name: str = "surf-spot-finder",
-    instructions: Optional[str] = None,
+    instructions: Optional[str] = SINGLE_AGENT_SYSTEM_PROMPT,
     api_key_var: Optional[str] = None,
     base_url: Optional[str] = None,
 ) -> RunResult:
@@ -87,7 +93,7 @@ def run_openai_agent(
         prompt (str): The prompt to be given to the agent.
         name (str, optional): The name of the agent. Defaults to "surf-spot-finder".
         instructions (Optional[str], optional): Initial instructions to give the agent.
-            Defaults to None.
+            Defaults to [SINGLE_AGENT_SYSTEM_PROMPT][surf_spot_finder.prompts.openai.SINGLE_AGENT_SYSTEM_PROMPT].
         api_key_var (Optional[str], optional): The name of the environment variable
             containing the OpenAI API key. If provided, along with `base_url`, an
             external OpenAI client will be used. Defaults to None.
@@ -126,27 +132,12 @@ def run_openai_agent(
     return result
 
 
-DEFAULT_MULTIAGENT_INSTRUCTIONS = """
-You will be asked to perform a task.
-
-Always follow this steps:
-
-First, before solving the task, look at the available agent/tools and plan a sequence of actions using the available tools.
-Second, show the plan of actions and ask for user verification. If the user does not verify the plan, come up with a better plan.
-Third, execute the plan using the available tools, until you get a final answer.
-
-Once you get a final answer, show it and ask for user verification.  If the user does not verify the answer, come up with a better answer.
-
-Finally, use the available handoff tool (`transfer_to_<agent_name>`) to communicate it to the user.
-"""
-
-
 @logger.catch(reraise=True)
 def run_openai_multi_agent(
     model_id: str,
     prompt: str,
     name: str = "surf-spot-finder",
-    instructions: Optional[str] = DEFAULT_MULTIAGENT_INSTRUCTIONS,
+    instructions: Optional[str] = MULTI_AGENT_SYSTEM_PROMPT,
 ) -> RunResult:
     """Runs multiple OpenAI agents orchestrated by a main agent.
 
@@ -162,7 +153,7 @@ def run_openai_multi_agent(
         prompt (str): The prompt to be given to the agent.
         name (str, optional): The name of the main agent. Defaults to "surf-spot-finder".
         instructions (Optional[str], optional): Initial instructions to give the agent.
-            Defaults to [DEFAULT_MULTIAGENT_INSTRUCTIONS][surf_spot_finder.agents.openai.DEFAULT_MULTIAGENT_INSTRUCTIONS].
+            Defaults to [MULTI_AGENT_SYSTEM_PROMPT][surf_spot_finder.prompts.openai.MULTI_AGENT_SYSTEM_PROMPT].
 
     Returns:
         RunResult: A RunResult object containing the output of the agent run.

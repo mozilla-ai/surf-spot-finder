@@ -1,14 +1,7 @@
 from typing import Annotated, Optional
 from pydantic import AfterValidator, BaseModel, FutureDatetime, PositiveInt
-from datetime import datetime
 
-CURRENT_DATE = datetime.now().strftime("%Y-%m-%d")
-
-DEFAULT_PROMPT = (
-    "What will be the best surf spot around {LOCATION}"
-    ", in a {MAX_DRIVING_HOURS} hour driving radius"
-    ", at {DATE}?"
-)
+from surf_spot_finder.prompts.shared import INPUT_PROMPT
 
 
 def validate_prompt(value) -> str:
@@ -26,7 +19,9 @@ def validate_agent_type(value) -> str:
 
 
 class Config(BaseModel):
-    prompt: Annotated[str, AfterValidator(validate_prompt)]
+    input_prompt_template: Annotated[str, AfterValidator(validate_prompt)] = (
+        INPUT_PROMPT
+    )
     location: str
     max_driving_hours: PositiveInt
     date: FutureDatetime

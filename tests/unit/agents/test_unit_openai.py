@@ -9,7 +9,10 @@ from surf_spot_finder.agents.openai import (
     search_web,
     user_verification,
     visit_webpage,
-    DEFAULT_MULTIAGENT_INSTRUCTIONS,
+)
+from surf_spot_finder.prompts.openai import (
+    SINGLE_AGENT_SYSTEM_PROMPT,
+    MULTI_AGENT_SYSTEM_PROMPT,
 )
 
 
@@ -23,7 +26,7 @@ def test_run_openai_agent_default():
         run_openai_agent("gpt-4o", "Test prompt")
         mock_agent.assert_called_once_with(
             model="gpt-4o",
-            instructions=None,
+            instructions=SINGLE_AGENT_SYSTEM_PROMPT,
             name="surf-spot-finder",
             tools=[search_web, visit_webpage],
         )
@@ -91,7 +94,7 @@ def test_run_openai_multiagent():
 
         mock_agent.assert_any_call(
             model="gpt-4o",
-            instructions=DEFAULT_MULTIAGENT_INSTRUCTIONS,
+            instructions=MULTI_AGENT_SYSTEM_PROMPT,
             name="surf-spot-finder",
             # TODO: add more elaborated checks
             handoffs=ANY,
