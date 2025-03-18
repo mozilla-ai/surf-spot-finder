@@ -30,3 +30,4 @@ class Config(BaseModel):
     api_key_var: Optional[str] = None
     json_tracer: bool = True
     api_base: Optional[str] = None
+    tools: Optional[list[str]] = None

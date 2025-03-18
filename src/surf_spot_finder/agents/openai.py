@@ -1,3 +1,4 @@
+import importlib
 import os
 from typing import Optional
 
@@ -10,76 +11,11 @@ from agents import (
     function_tool,
 )
 from loguru import logger
-from smolagents import (
-    DuckDuckGoSearchTool,
-    VisitWebpageTool,
-    FinalAnswerTool,
-)
-
 
 from surf_spot_finder.prompts.openai import (
     SINGLE_AGENT_SYSTEM_PROMPT,
     MULTI_AGENT_SYSTEM_PROMPT,
 )
-from surf_spot_finder.tools.openmeteo import get_wave_forecast, get_wind_forecast
-from surf_spot_finder.tools.openstreetmap import (
-    driving_hours_to_meters,
-    get_area_lat_lon,
-    get_surfing_places,
-)
-
-driving_hours_to_meters = function_tool(driving_hours_to_meters)
-get_area_lat_lon = function_tool(get_area_lat_lon)
-get_surfing_places = function_tool(get_surfing_places)
-get_wave_forecast = function_tool(get_wave_forecast)
-get_wind_forecast = function_tool(get_wind_forecast)
-
-
-@function_tool
-def search_web(query: str) -> str:
-    """Performs a duckduckgo web search based on your query (think a Google search) then returns the top search results.
-
-    Args:
-        query: The search query to perform.
-    """
-    logger.debug(f"Calling search_web: {query}")
-    search_tool = DuckDuckGoSearchTool()
-    return search_tool.forward(query)
-
-
-@function_tool
-def visit_webpage(url: str) -> str:
-    """Visits a webpage at the given url and reads its content as a markdown string. Use this to browse webpages.
-
-    Args:
-        url: The url of the webpage to visit.
-    """
-    logger.debug(f"Calling visit_webpage: {url}")
-    visit_tool = VisitWebpageTool()
-    return visit_tool.forward(url)
-
-
-@function_tool
-def final_answer(answer: str) -> str:
-    """Provides a final answer to the given problem.
-
-    Args:
-        answer: The answer to the problem.
-    """
-    logger.debug("Calling final_answer")
-    final_answer_tool = FinalAnswerTool()
-    return final_answer_tool.forward(answer)
-
-
-@function_tool
-def user_verification(query: str) -> str:
-    """Asks user to verify the given `query`.
-
-    Args:
-        query: The question that requires verification.
-    """
-    logger.debug("Calling user_verification")
-    return input(f"{query} => Type your answer here:")
 
 
 @logger.catch(reraise=True)
@@ -89,7 +25,8 @@ def run_openai_agent(
     name: str = "surf-spot-finder",
     instructions: Optional[str] = SINGLE_AGENT_SYSTEM_PROMPT,
     api_key_var: Optional[str] = None,
-    base_url: Optional[str] = None,
+    api_base: Optional[str] = None,
+    tools: Optional[list[str]] = None,
 ) -> RunResult:
     """Runs an OpenAI agent with the given prompt and configuration.
 
@@ -109,19 +46,34 @@ def run_openai_agent(
         api_key_var (Optional[str], optional): The name of the environment variable
             containing the OpenAI API key. If provided, along with `base_url`, an
             external OpenAI client will be used. Defaults to None.
-        base_url (Optional[str], optional): The base URL for the OpenAI API.
+        api_base (Optional[str], optional): The base URL for the OpenAI API.
             Required if `api_key_var` is provided to use an external OpenAI client.
             Defaults to None.
+
 
     Returns:
         RunResult: A RunResult object containing the output of the agent run.
             See https://openai.github.io/openai-agents-python/ref/result/#agents.result.RunResult.
     """
 
-    if api_key_var and base_url:
+    if tools is None:
+        tools = [
+            "surf_spot_finder.tools.search_web",
+            "surf_spot_finder.tools.visit_webpage",
+        ]
+
+    imported_tools = []
+    for tool in tools:
+        module, func = tool.rsplit(".", 1)
+        module = importlib.import_module(module)
+        tool = getattr(module, func)
+        imported_tools.append(function_tool(tool))
+
+    logger.info(f"Imported tools: {imported_tools}")
+    if api_key_var and api_base:
         external_client = AsyncOpenAI(
             api_key=os.environ[api_key_var],
-            base_url=base_url,
+            base_url=api_base,
         )
         agent = Agent(
             name=name,
@@ -130,22 +82,14 @@ def run_openai_agent(
                 model=model_id,
                 openai_client=external_client,
             ),
-            tools=[search_web, visit_webpage],
+            tools=imported_tools,
         )
     else:
         agent = Agent(
             model=model_id,
             instructions=instructions,
             name=name,
-            tools=[
-                search_web,
-                visit_webpage,
-                get_area_lat_lon,
-                get_surfing_places,
-                get_wave_forecast,
-                get_wind_forecast,
-                driving_hours_to_meters,
-            ],
+            tools=imported_tools,
         )
     result = Runner.run_sync(agent, prompt)
     logger.info(result.final_output)
@@ -158,6 +102,7 @@ def run_openai_multi_agent(
     prompt: str,
     name: str = "surf-spot-finder",
     instructions: Optional[str] = MULTI_AGENT_SYSTEM_PROMPT,
+    **kwargs,
 ) -> RunResult:
     """Runs multiple OpenAI agents orchestrated by a main agent.
 
@@ -179,25 +124,33 @@ def run_openai_multi_agent(
         RunResult: A RunResult object containing the output of the agent run.
             See https://openai.github.io/openai-agents-python/ref/result/#agents.result.RunResult.
     """
+    from surf_spot_finder.tools import (
+        ask_user_verification,
+        show_final_answer,
+        show_plan,
+        search_web,
+        visit_webpage,
+    )
+
     user_verification_agent = Agent(
         model=model_id,
-        instructions="Display the current output to the user, then ask for verification.",
+        instructions="Interact with the user by showing information and asking for verification.",
         name="user-verification-agent",
-        tools=[user_verification],
+        tools=[function_tool(ask_user_verification), function_tool(show_plan)],
     )
 
     search_web_agent = Agent(
         model=model_id,
-        instructions="Find relevant information about the provided task by combining web searches with visiting webpages.",
+        instructions="Find relevant information about the provided task by using your tools.",
         name="search-web-agent",
-        tools=[search_web, visit_webpage],
+        tools=[function_tool(search_web), function_tool(visit_webpage)],
     )
 
     communication_agent = Agent(
         model=model_id,
-        instructions=None,
+        instructions="Communicate the final answer to the user.",
         name="communication-agent",
-        tools=[final_answer],
+        tools=[function_tool(show_final_answer)],
     )
 
     main_agent = Agent(

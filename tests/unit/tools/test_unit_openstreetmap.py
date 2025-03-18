@@ -29,7 +29,7 @@ def test_get_lat_lon_center():
     assert lon == -2.5
 
 
-def test_get_surfing_places():
+def test_get_surfing_spots():
     with patch("requests.get") as mock_get:
         mock_response = MagicMock()
         mock_response.status_code = 200
@@ -66,7 +66,7 @@ def test_get_surfing_places():
         }
         mock_get.return_value = mock_response
 
-        results = openstreetmap.get_surfing_places(lat=40.5, lon=-3.5, radius=10000)
+        results = openstreetmap.get_surfing_spots(lat=40.5, lon=-3.5, radius=10000)
         assert len(results) == 2
         assert results[0][0] == "Surf Spot 1"
         assert results[0][1] == (40.05, -2.95)

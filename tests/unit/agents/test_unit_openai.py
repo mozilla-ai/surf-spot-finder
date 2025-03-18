@@ -3,11 +3,15 @@ import pytest
 from unittest.mock import patch, MagicMock, ANY
 
 from surf_spot_finder.agents.openai import (
-    final_answer,
     run_openai_agent,
     run_openai_multi_agent,
+    function_tool,
+)
+from surf_spot_finder.tools import (
+    show_final_answer,
+    show_plan,
+    ask_user_verification,
     search_web,
-    user_verification,
     visit_webpage,
 )
 from surf_spot_finder.prompts.openai import (
@@ -46,7 +50,7 @@ def test_run_openai_agent_base_url_and_api_key_var():
         patch.dict(os.environ, {"TEST_API_KEY": "test-key-12345"}),
     ):
         run_openai_agent(
-            "gpt-4o", "Test prompt", base_url="FOO", api_key_var="TEST_API_KEY"
+            "gpt-4o", "Test prompt", api_base="FOO", api_key_var="TEST_API_KEY"
         )
         async_openai_mock.assert_called_once_with(
             api_key="test-key-12345",
@@ -59,7 +63,7 @@ def test_run_openai_environment_error():
     with patch.dict(os.environ, {}, clear=True):
         with pytest.raises(KeyError, match="MISSING_KEY"):
             run_openai_agent(
-                "test-model", "Test prompt", base_url="FOO", api_key_var="MISSING_KEY"
+                "test-model", "Test prompt", api_base="FOO", api_key_var="MISSING_KEY"
             )
 
 
@@ -73,23 +77,23 @@ def test_run_openai_multiagent():
         run_openai_multi_agent("gpt-4o", "Test prompt")
         mock_agent.assert_any_call(
             model="gpt-4o",
-            instructions="Display the current output to the user, then ask for verification.",
+            instructions="Interact with the user by showing information and asking for verification.",
             name="user-verification-agent",
-            tools=[user_verification],
+            tools=[function_tool(show_plan), function_tool(ask_user_verification)],
         )
 
         mock_agent.assert_any_call(
             model="gpt-4o",
-            instructions="Find relevant information about the provided task by combining web searches with visiting webpages.",
+            instructions="Find relevant information about the provided task by using your tools.",
             name="search-web-agent",
-            tools=[search_web, visit_webpage],
+            tools=[function_tool(search_web), function_tool(visit_webpage)],
         )
 
         mock_agent.assert_any_call(
             model="gpt-4o",
-            instructions=None,
+            instructions="Communicate the final answer to the user.",
             name="communication-agent",
-            tools=[final_answer],
+            tools=[function_tool(show_final_answer)],
         )
 
         mock_agent.assert_any_call(

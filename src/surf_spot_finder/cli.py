@@ -24,6 +24,7 @@ def find_surf_spot(
     input_prompt_template: str = INPUT_PROMPT,
     json_tracer: bool = True,
     api_base: Optional[str] = None,
+    tools: Optional[list[dict]] = None,
     from_config: Optional[str] = None,
 ):
     """Find the best surf spot based on the given criteria.
@@ -82,6 +83,9 @@ def find_surf_spot(
             MAX_DRIVING_HOURS=config.max_driving_hours,
             DATE=config.date,
         ),
+        api_base=config.api_base,
+        api_key_var=config.api_key_var,
+        tools=config.tools,
     )
 
 

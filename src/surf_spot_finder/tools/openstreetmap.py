@@ -59,10 +59,10 @@ def get_lat_lon_center(bounds: dict) -> tuple[float, float]:
     )
 
 
-def get_surfing_places(
+def get_surfing_spots(
     lat: float, lon: float, radius: int
 ) -> list[tuple[str, tuple[float, float]]]:
-    """Get surfing places around a given latitude and longitude.
+    """Get surfing spots around a given latitude and longitude.
 
     Uses the [Overpass API](https://wiki.openstreetmap.org/wiki/Overpass_API).
 
