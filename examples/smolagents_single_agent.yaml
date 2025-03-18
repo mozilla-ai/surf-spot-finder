@@ -2,5 +2,6 @@ location: Pontevedra
 date: 2025-03-22 12:00
 max_driving_hours: 2
 model_id: openai/gpt-3.5-turbo
+api_key_var: OPENAI_API_KEY
 agent_type: smolagents
 # input_prompt_template:
