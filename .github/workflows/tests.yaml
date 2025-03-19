@@ -28,7 +28,7 @@ jobs:
           cache: "pip"
 
       - name: Install
-        run: pip install -e '.[openai,tests]'
+        run: pip install -e '.[smolagents,openai,tests]'
 
       - name: Run tests
         run: pytest -v tests

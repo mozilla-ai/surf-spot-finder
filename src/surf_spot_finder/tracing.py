@@ -6,7 +6,6 @@ from opentelemetry import trace
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import SimpleSpanProcessor
 from opentelemetry.sdk.trace.export import SpanExporter
-from phoenix.otel import register
 
 
 class JsonFileSpanExporter(SpanExporter):
@@ -74,6 +73,8 @@ def get_tracer_provider(
         span_processor = SimpleSpanProcessor(json_file_exporter)
         tracer_provider.add_span_processor(span_processor)
     else:
+        from phoenix.otel import register
+
         tracer_provider = register(
             project_name=project_name, set_global_tracer_provider=True
         )

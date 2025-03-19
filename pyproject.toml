@@ -9,18 +9,26 @@ license = {text = "Apache-2.0"}
 requires-python = ">=3.10"
 dynamic = ["version"]
 dependencies = [
-  "arize-phoenix>=8.12.1",
   "fire",
   "loguru",
-  "mcp==1.3.0",
+  "opentelemetry-exporter-otlp",
+  "opentelemetry-sdk",
   "pydantic",
-  "smolagents[litellm,mcp,telemetry]>=1.10.0",
 ]
 
 [project.optional-dependencies]
+smolagents = [
+  "smolagents[litellm]>=1.10.0",
+  "openinference-instrumentation-smolagents>=0.1.4"
+]
+
 openai = [
   "openai-agents",
   "openinference-instrumentation-openai"
+]
+
+mcp = [
+  "mcp==1.3.0",
 ]
 
 demo = [
@@ -41,7 +49,7 @@ tests = [
 ]
 
 # TODO maybe we don't want to keep this, or we want to swap this to Lumigator SDK
-tracing = [
+arize = [
   "arize-phoenix>=8.12.1",
 ]
 
