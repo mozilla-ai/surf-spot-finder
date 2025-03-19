@@ -14,7 +14,7 @@ def test_get_tracer_provider(tmp_path, json_tracer):
     with (
         patch("surf_spot_finder.tracing.trace", mock_trace),
         patch("surf_spot_finder.tracing.TracerProvider", mock_tracer_provider),
-        patch("surf_spot_finder.tracing.register", mock_register),
+        patch("phoenix.otel.register", mock_register),
     ):
         get_tracer_provider(
             project_name="test_project",

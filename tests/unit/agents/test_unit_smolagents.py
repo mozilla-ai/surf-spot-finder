@@ -11,31 +11,18 @@ def common_patches():
     litellm_model_mock = MagicMock()
     code_agent_mock = MagicMock()
     patch_context = contextlib.ExitStack()
-    mock_tool_collection = MagicMock()
-
-    mock_tool_collection.from_mcp.return_value.__enter__.return_value = (
-        mock_tool_collection
-    )
-    mock_tool_collection.from_mcp.return_value.__exit__.return_value = None
-    mock_tool_collection.tools = ["mock_tool"]
-    patch_context.enter_context(
-        patch("surf_spot_finder.agents.smolagents.StdioServerParameters", MagicMock())
-    )
     patch_context.enter_context(
         patch("surf_spot_finder.agents.smolagents.CodeAgent", code_agent_mock)
     )
     patch_context.enter_context(
         patch("surf_spot_finder.agents.smolagents.LiteLLMModel", litellm_model_mock)
     )
-    patch_context.enter_context(
-        patch("surf_spot_finder.agents.smolagents.ToolCollection", mock_tool_collection)
-    )
-    yield patch_context, litellm_model_mock, code_agent_mock, mock_tool_collection
+    yield patch_context, litellm_model_mock, code_agent_mock
     patch_context.close()
 
 
 def test_run_smolagent_with_api_key_var(common_patches):
-    patch_context, litellm_model_mock, code_agent_mock, *_ = common_patches
+    patch_context, litellm_model_mock, code_agent_mock = common_patches
 
     with patch_context, patch.dict(os.environ, {"TEST_API_KEY": "test-key-12345"}):
         run_smolagent("openai/gpt-4", "Test prompt", api_key_var="TEST_API_KEY")

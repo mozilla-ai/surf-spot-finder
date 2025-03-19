@@ -5,7 +5,6 @@ from unittest.mock import patch, MagicMock, ANY
 from surf_spot_finder.agents.openai import (
     run_openai_agent,
     run_openai_multi_agent,
-    function_tool,
 )
 from surf_spot_finder.tools import (
     show_final_answer,
@@ -69,31 +68,36 @@ def test_run_openai_environment_error():
 
 def test_run_openai_multiagent():
     mock_agent = MagicMock()
+    mock_function_tool = MagicMock()
 
     with (
         patch("surf_spot_finder.agents.openai.Agent", mock_agent),
         patch("surf_spot_finder.agents.openai.Runner", MagicMock()),
+        patch("surf_spot_finder.agents.openai.function_tool", mock_function_tool),
     ):
         run_openai_multi_agent("gpt-4o", "Test prompt")
         mock_agent.assert_any_call(
             model="gpt-4o",
             instructions="Interact with the user by showing information and asking for verification.",
             name="user-verification-agent",
-            tools=[function_tool(show_plan), function_tool(ask_user_verification)],
+            tools=[
+                mock_function_tool(show_plan),
+                mock_function_tool(ask_user_verification),
+            ],
         )
 
         mock_agent.assert_any_call(
             model="gpt-4o",
             instructions="Find relevant information about the provided task by using your tools.",
             name="search-web-agent",
-            tools=[function_tool(search_web), function_tool(visit_webpage)],
+            tools=[mock_function_tool(search_web), mock_function_tool(visit_webpage)],
         )
 
         mock_agent.assert_any_call(
             model="gpt-4o",
             instructions="Communicate the final answer to the user.",
             name="communication-agent",
-            tools=[function_tool(show_final_answer)],
+            tools=[mock_function_tool(show_final_answer)],
         )
 
         mock_agent.assert_any_call(
