@@ -17,6 +17,11 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+langchain = [
+  "langchain",
+  "langgraph",
+  "openinference-instrumentation-langchain"
+]
 smolagents = [
   "smolagents[litellm]>=1.10.0",
   "openinference-instrumentation-smolagents>=0.1.4"

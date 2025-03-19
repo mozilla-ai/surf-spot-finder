@@ -104,3 +104,7 @@ def setup_tracing(tracer_provider: TracerProvider, agent_type: str) -> None:
         from openinference.instrumentation.smolagents import SmolagentsInstrumentor
 
         SmolagentsInstrumentor().instrument(tracer_provider=tracer_provider)
+    elif agent_type == "langchain":
+        from openinference.instrumentation.langchain import LangChainInstrumentor
+
+        LangChainInstrumentor().instrument(tracer_provider=tracer_provider)

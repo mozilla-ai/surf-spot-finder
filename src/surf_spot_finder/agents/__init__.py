@@ -1,7 +1,9 @@
+from .langchain import run_lanchain_agent
 from .openai import run_openai_agent, run_openai_multi_agent
 from .smolagents import run_smolagent
 
 RUNNERS = {
+    "langchain": run_lanchain_agent,
     "openai": run_openai_agent,
     "smolagents": run_smolagent,
     "openai_multi_agent": run_openai_multi_agent,
