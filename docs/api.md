@@ -8,6 +8,8 @@
 
 ::: surf_spot_finder.agents.RUNNERS
 
+::: surf_spot_finder.agents.langchain
+
 ::: surf_spot_finder.agents.openai
 
 ::: surf_spot_finder.agents.smolagents

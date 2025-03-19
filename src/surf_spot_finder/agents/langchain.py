@@ -19,7 +19,9 @@ except ImportError:
 def run_lanchain_agent(
     model_id: str, prompt: str, tools: list[str] | None = None, **kwargs
 ):
-    """Runs an langchain agent with the given prompt and configuration.
+    """Runs an langchain ReAct agent with the given prompt and configuration.
+
+    Uses [create_react_agent](https://langchain-ai.github.io/langgraph/reference/prebuilt/#langgraph.prebuilt.chat_agent_executor.create_react_agent).
 
     Args:
         model_id: The ID of the model to use.
