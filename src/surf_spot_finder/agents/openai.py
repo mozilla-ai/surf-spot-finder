@@ -2,20 +2,26 @@ import importlib
 import os
 from typing import Optional
 
-from agents import (
-    Agent,
-    AsyncOpenAI,
-    OpenAIChatCompletionsModel,
-    Runner,
-    RunResult,
-    function_tool,
-)
 from loguru import logger
 
 from surf_spot_finder.prompts.openai import (
     SINGLE_AGENT_SYSTEM_PROMPT,
     MULTI_AGENT_SYSTEM_PROMPT,
 )
+
+try:
+    from agents import (
+        Agent,
+        AsyncOpenAI,
+        OpenAIChatCompletionsModel,
+        Runner,
+        RunResult,
+        function_tool,
+    )
+
+    agents_available = True
+except ImportError:
+    agents_available = None
 
 
 @logger.catch(reraise=True)
@@ -55,6 +61,8 @@ def run_openai_agent(
         RunResult: A RunResult object containing the output of the agent run.
             See https://openai.github.io/openai-agents-python/ref/result/#agents.result.RunResult.
     """
+    if not agents_available:
+        raise ImportError("You need to `pip install openai-agents` to use this agent")
 
     if tools is None:
         tools = [
@@ -124,6 +132,9 @@ def run_openai_multi_agent(
         RunResult: A RunResult object containing the output of the agent run.
             See https://openai.github.io/openai-agents-python/ref/result/#agents.result.RunResult.
     """
+    if not agents_available:
+        raise ImportError("You need to `pip install openai-agents` to use this agent")
+
     from surf_spot_finder.tools import (
         ask_user_verification,
         show_final_answer,

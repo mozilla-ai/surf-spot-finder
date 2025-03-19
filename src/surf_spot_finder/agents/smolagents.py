@@ -4,12 +4,18 @@ from typing import Optional
 
 from loguru import logger
 
-from smolagents import (
-    CodeAgent,
-    LiteLLMModel,
-    ToolCollection,
-)
 from surf_spot_finder.prompts.smolagents import SYSTEM_PROMPT
+
+try:
+    from smolagents import (
+        CodeAgent,
+        LiteLLMModel,
+        ToolCollection,
+    )
+
+    smolagents_available = True
+except ImportError:
+    smolagents_available = None
 
 
 @logger.catch(reraise=True)
@@ -39,6 +45,9 @@ def run_smolagent(
         >>> agent = run_smolagent("anthropic/claude-3-haiku", "my prompt here", "ANTHROPIC_API_KEY", None, None)
         >>> agent.run("Find surf spots near San Diego")
     """
+    if not smolagents_available:
+        raise ImportError("You need to `pip install smolagents` to use this agent")
+
     if tools is None:
         tools = [
             "smolagents.DuckDuckGoSearchTool",
