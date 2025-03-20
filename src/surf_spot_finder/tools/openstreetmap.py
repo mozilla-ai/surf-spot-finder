@@ -8,10 +8,10 @@ def get_area_lat_lon(area_name: str) -> tuple[float, float]:
     Uses the [Nominatim API](https://nominatim.org/release-docs/develop/api/Search/).
 
     Args:
-        area_name (str): The name of the area.
+        area_name: The name of the area.
 
     Returns:
-        dict: The area found.
+        The area found.
     """
     response = requests.get(
         f"https://nominatim.openstreetmap.org/search?q={area_name}&format=json",
@@ -27,10 +27,10 @@ def driving_hours_to_meters(driving_hours: int) -> int:
 
 
     Args:
-        driving_hours (int): The driving hours.
+        driving_hours: The driving hours.
 
     Returns:
-        int: The distance in meters.
+        The distance in meters.
     """
     return driving_hours * 70 * 1000
 
@@ -39,7 +39,7 @@ def get_lat_lon_center(bounds: dict) -> tuple[float, float]:
     """Get the latitude and longitude of the center of a bounding box.
 
     Args:
-        bounds (dict): The bounding box.
+        bounds: The bounding box.
 
             ```json
             {
@@ -51,7 +51,7 @@ def get_lat_lon_center(bounds: dict) -> tuple[float, float]:
             ```
 
     Returns:
-        tuple: The latitude and longitude of the center.
+        The latitude and longitude of the center.
     """
     return (
         (bounds["minlat"] + bounds["maxlat"]) / 2,
@@ -67,12 +67,12 @@ def get_surfing_spots(
     Uses the [Overpass API](https://wiki.openstreetmap.org/wiki/Overpass_API).
 
     Args:
-        lat (float): The latitude.
-        lon (float): The longitude.
-        radius (int): The radius in meters.
+        lat: The latitude.
+        lon: The longitude.
+        radius: The radius in meters.
 
     Returns:
-        dict: The surfing places found.
+        The surfing places found.
     """
     overpass_url = "https://overpass-api.de/api/interpreter"
     query = "[out:json];("

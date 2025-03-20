@@ -1,4 +1,3 @@
-import importlib
 import os
 from typing import Optional
 
@@ -8,6 +7,8 @@ from surf_spot_finder.prompts.openai import (
     SINGLE_AGENT_SYSTEM_PROMPT,
     MULTI_AGENT_SYSTEM_PROMPT,
 )
+from surf_spot_finder.tools.wrappers import import_and_wrap_tools, wrap_tool_openai
+
 
 try:
     from agents import (
@@ -70,12 +71,7 @@ def run_openai_agent(
             "surf_spot_finder.tools.visit_webpage",
         ]
 
-    imported_tools = []
-    for tool in tools:
-        module, func = tool.rsplit(".", 1)
-        module = importlib.import_module(module)
-        tool = getattr(module, func)
-        imported_tools.append(function_tool(tool))
+    imported_tools = import_and_wrap_tools(tools, wrap_tool_openai)
 
     if api_key_var and api_base:
         external_client = AsyncOpenAI(

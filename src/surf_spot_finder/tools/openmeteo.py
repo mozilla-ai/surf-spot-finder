@@ -35,13 +35,13 @@ def get_wave_forecast(lat: float, lon: float, date: str | None = None) -> list[d
     - sea_level_height_msl (meters)
 
     Args:
-        lat (float): Latitude of the location.
-        lon (float): Longitude of the location.
-        date (str | None): Date to filter by in any valid ISO 8601 format.
+        lat: Latitude of the location.
+        lon: Longitude of the location.
+        date: Date to filter by in any valid ISO 8601 format.
             If not provided, all data (default to 6 days forecast) will be returned.
 
     Returns:
-        list[dict]: Hourly data for wave forecast.
+        Hourly data for wave forecast.
             Example output:
 
             ```json
@@ -81,19 +81,19 @@ def get_wind_forecast(lat: float, lon: float, date: str | None = None) -> list[d
     - wind_speed (meters per second)
 
     Args:
-        lat (float): Latitude of the location.
-        lon (float): Longitude of the location.
-        date (str | None): Date to filter by in any valid ISO 8601 format.
+        lat: Latitude of the location.
+        lon: Longitude of the location.
+        date: Date to filter by in any valid ISO 8601 format.
             If not provided, all data (default to 6 days forecast) will be returned.
 
     Returns:
-        list[dict]: Hourly data for wind forecast.
+        Hourly data for wind forecast.
             Example output:
 
             ```json
             [
-                {"time": "2025-03-18T22:00", "wave_direction": 264, "wave_height": 2.24, "wave_period": 10.45, "sea_level_height_msl": -1.27},
-                {"time": "2025-03-18T23:00", "wave_direction": 264, "wave_height": 2.24, "wave_period": 10.35, "sea_level_height_msl": -1.35},
+                {"time": "2025-03-18T22:00", "wind_direction": 196, "wind_speed": 9.6},
+                {"time": "2025-03-18T23:00", "wind_direction": 183, "wind_speed": 7.9},
             ]
             ```
     """

@@ -1,16 +1,16 @@
-import importlib
 import os
 from typing import Optional
 
 from loguru import logger
 
 from surf_spot_finder.prompts.smolagents import SYSTEM_PROMPT
+from surf_spot_finder.tools.wrappers import import_and_wrap_tools, wrap_tool_smolagents
+
 
 try:
     from smolagents import (
         CodeAgent,
         LiteLLMModel,
-        ToolCollection,
     )
 
     smolagents_available = True
@@ -55,16 +55,12 @@ def run_smolagent(
             "smolagents.PythonInterpreterTool",
         ]
 
-    imported_tools = []
     mcp_tool = None
     for tool in tools:
         if "mcp" in tool:
             mcp_tool = tool
-        else:
-            module, func = tool.rsplit(".", 1)
-            module = importlib.import_module(module)
-            tool = getattr(module, func)
-            imported_tools.append(tool())
+            tools.remove(tool)
+    imported_tools = import_and_wrap_tools(tools, wrap_tool_smolagents)
 
     model = LiteLLMModel(
         model_id=model_id,
@@ -74,6 +70,7 @@ def run_smolagent(
 
     if mcp_tool:
         from mcp import StdioServerParameters
+        from smolagents import ToolCollection
 
         # We could easily use any of the MCPs at https://github.com/modelcontextprotocol/servers
         # or at https://glama.ai/mcp/servers
