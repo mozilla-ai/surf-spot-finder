@@ -67,7 +67,7 @@ def find_surf_spot(
             prompt=input_prompt_template,
             json_tracer=json_tracer,
             api_base=api_base,
-            tools=tools
+            tools=tools,
         )
 
     logger.info("Setting up tracing")
