@@ -90,7 +90,7 @@ def extract_evidence(telemetry: List[Dict[str, Any]], agent_type: AgentType) -> 
                     try:
                         input_value = json.loads(attributes["input.value"])
                         tool_info["input"] = input_value
-                    except Exception as e:
+                    except Exception:
                         tool_info["input"] = attributes["input.value"]
 
                 # Extract output if available
@@ -191,7 +191,7 @@ def extract_evidence(telemetry: List[Dict[str, Any]], agent_type: AgentType) -> 
                     try:
                         input_value = json.loads(attributes["input.value"])
                         tool_info["input"] = input_value
-                    except Exception as e:
+                    except Exception:
                         tool_info["input"] = attributes["input.value"]
 
                 if "output.value" in attributes:

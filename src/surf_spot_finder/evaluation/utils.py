@@ -26,7 +26,7 @@ def determine_agent_type(trace: List[Dict[str, Any]]) -> AgentType:
             logger.info("Agent type is SMOLAGENTS")
             return AgentType.SMOLAGENTS
     raise ValueError(
-        f"Could not determine agent type from trace, or agent type not supported"
+        "Could not determine agent type from trace, or agent type not supported"
     )
 
 
