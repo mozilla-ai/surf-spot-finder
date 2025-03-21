@@ -1,11 +1,8 @@
 import os
 import json
 from datetime import datetime
-
-from opentelemetry import trace
 from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import SimpleSpanProcessor
-from opentelemetry.sdk.trace.export import SpanExporter
+from opentelemetry.sdk.trace.export import SimpleSpanProcessor, SpanExporter
 
 
 class JsonFileSpanExporter(SpanExporter):
@@ -66,8 +63,6 @@ def get_tracer_provider(
         timestamp = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
 
         tracer_provider = TracerProvider()
-        trace.set_tracer_provider(tracer_provider)
-
         file_name = f"{output_dir}/{project_name}-{timestamp}.json"
         json_file_exporter = JsonFileSpanExporter(file_name=file_name)
         span_processor = SimpleSpanProcessor(json_file_exporter)
@@ -97,14 +92,17 @@ def setup_tracing(tracer_provider: TracerProvider, agent_type: str) -> None:
     validate_agent_type(agent_type)
 
     if "openai" in agent_type:
-        from openinference.instrumentation.openai_agents import OpenAIAgentsInstrumentor
-
-        OpenAIAgentsInstrumentor().instrument(tracer_provider=tracer_provider)
+        from openinference.instrumentation.openai_agents import (
+            OpenAIAgentsInstrumentor as Instrumentor,
+        )
     elif agent_type == "smolagents":
-        from openinference.instrumentation.smolagents import SmolagentsInstrumentor
-
-        SmolagentsInstrumentor().instrument(tracer_provider=tracer_provider)
+        from openinference.instrumentation.smolagents import (
+            SmolagentsInstrumentor as Instrumentor,
+        )
     elif agent_type == "langchain":
-        from openinference.instrumentation.langchain import LangChainInstrumentor
-
-        LangChainInstrumentor().instrument(tracer_provider=tracer_provider)
+        from openinference.instrumentation.langchain import (
+            LangChainInstrumentor as Instrumentor,
+        )
+    else:
+        raise ValueError(f"Unsupported agent type: {agent_type}")
+    Instrumentor().instrument(tracer_provider=tracer_provider)

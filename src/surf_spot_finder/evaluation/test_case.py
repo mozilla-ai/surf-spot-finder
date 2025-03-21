@@ -15,6 +15,7 @@ class InputModel(BaseModel):
     json_tracer: bool
     api_base: Optional[str] = None
     agent_type: str
+    tools: Optional[List[str]] = None
 
 
 class CheckpointCriteria(BaseModel):

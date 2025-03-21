@@ -4,17 +4,17 @@ from textwrap import dedent
 from typing import Any, Dict, List, Optional
 from loguru import logger
 from fire import Fire
-from surf_spot_finder.agents.smolagents import run_smolagent
+from surf_spot_finder.cli import find_surf_spot
 from surf_spot_finder.config import (
-    DEFAULT_PROMPT,
     Config,
 )
-from surf_spot_finder.tracing import get_tracer_provider, setup_tracing
+from surf_spot_finder.prompts.shared import INPUT_PROMPT
 from surf_spot_finder.evaluation.utils import (
-    extract_hypothesis_answer,
+    determine_agent_type,
     verify_checkpoints,
     verify_hypothesis_answer,
 )
+from surf_spot_finder.evaluation.telemetry_utils import extract_hypothesis_answer
 from surf_spot_finder.evaluation.test_case import TestCase
 
 logger.remove()
@@ -31,31 +31,23 @@ def run_agent(test_case: TestCase) -> str:
         max_driving_hours=input_data.max_driving_hours,
         model_id=input_data.model_id,
         api_key_var=input_data.api_key_var,
-        prompt=DEFAULT_PROMPT,
+        prompt=INPUT_PROMPT,
         json_tracer=input_data.json_tracer,
         api_base=input_data.api_base,
         agent_type=input_data.agent_type,
+        tools=input_data.tools,
     )
-    # project_name is a name + uuid
-    project_name = "surf-spot-finder"
-
-    logger.info("Setting up tracing")
-    tracer_provider, telemetry_path = get_tracer_provider(
-        project_name=project_name, json_tracer=config.json_tracer
-    )
-    setup_tracing(tracer_provider, agent_type=config.agent_type)
-    logger.info("Running agent")
-    run_smolagent(
+    return find_surf_spot(
+        location=config.location,
+        date=config.date,
+        max_driving_hours=config.max_driving_hours,
+        agent_type=config.agent_type,
         model_id=config.model_id,
         api_key_var=config.api_key_var,
+        json_tracer=config.json_tracer,
         api_base=config.api_base,
-        prompt=config.prompt.format(
-            LOCATION=config.location,
-            MAX_DRIVING_HOURS=config.max_driving_hours,
-            DATE=config.date,
-        ),
+        tools=config.tools,
     )
-    return telemetry_path
 
 
 def evaluate_telemetry(test_case: TestCase, telemetry_path: str) -> bool:
@@ -64,8 +56,12 @@ def evaluate_telemetry(test_case: TestCase, telemetry_path: str) -> bool:
         telemetry: List[Dict[str, Any]] = json.loads(f.read())
     logger.info(f"Telemetry loaded from {telemetry_path}")
 
+    agent_type = determine_agent_type(telemetry)
+
     # Extract the final answer from the telemetry
-    hypothesis_answer = extract_hypothesis_answer(telemetry)
+    hypothesis_answer = extract_hypothesis_answer(
+        trace=telemetry, agent_type=agent_type
+    )
     logger.info(
         f"""<yellow>Hypothesis Final answer extracted: {hypothesis_answer}</yellow>"""
     )
@@ -75,6 +71,7 @@ def evaluate_telemetry(test_case: TestCase, telemetry_path: str) -> bool:
         telemetry=telemetry,
         checkpoints=test_case.checkpoints,
         model=llm_judge,
+        agent_type=agent_type,
     )
 
     hypothesis_answer_results = verify_hypothesis_answer(
@@ -110,12 +107,8 @@ def evaluate_telemetry(test_case: TestCase, telemetry_path: str) -> bool:
             logger.error(message)
     else:
         logger.info("<green>All checkpoints passed!</green>")
-    logger.info(
-        f"<green>Passed checkpoints: {len(passed_checks)}/{len(verification_results)}</green>"
-    )
-    logger.info(
-        f"<red>Failed checkpoints: {len(failed_checks)}/{len(verification_results)}</red>"
-    )
+    logger.info(f"<green>Passed checkpoints: {len(passed_checks)}</green>")
+    logger.info(f"<red>Failed checkpoints: {len(failed_checks)}</red>")
     logger.info("<green>=====================================</green>")
     logger.info(f"<green>Score: {won_points}/{won_points + missed_points}</green>")
     logger.info("<green>=====================================</green>")

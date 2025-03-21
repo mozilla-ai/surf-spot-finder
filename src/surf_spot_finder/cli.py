@@ -26,7 +26,7 @@ def find_surf_spot(
     api_base: Optional[str] = None,
     tools: Optional[list[dict]] = None,
     from_config: Optional[str] = None,
-):
+) -> str:
     """Find the best surf spot based on the given criteria.
 
     Args:
@@ -67,10 +67,11 @@ def find_surf_spot(
             prompt=input_prompt_template,
             json_tracer=json_tracer,
             api_base=api_base,
+            tools=tools,
         )
 
     logger.info("Setting up tracing")
-    tracer_provider, _ = get_tracer_provider(
+    tracer_provider, tracing_path = get_tracer_provider(
         project_name="surf-spot-finder", json_tracer=config.json_tracer
     )
     setup_tracing(tracer_provider, config.agent_type)
@@ -87,6 +88,7 @@ def find_surf_spot(
         api_key_var=config.api_key_var,
         tools=config.tools,
     )
+    return tracing_path
 
 
 def main():

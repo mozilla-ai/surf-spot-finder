@@ -4,9 +4,30 @@ import re
 
 from litellm import completion
 from textwrap import dedent
+from loguru import logger
 
 from pydantic import BaseModel, ConfigDict
+from surf_spot_finder.evaluation.telemetry_utils import extract_evidence
 from surf_spot_finder.evaluation.test_case import CheckpointCriteria
+
+from surf_spot_finder.agents import AgentType
+
+
+def determine_agent_type(trace: List[Dict[str, Any]]) -> AgentType:
+    """Determine the agent type based on the trace.
+    These are not really stable ways to find it, because we're waiting on some
+    reliable method for determining the agent type. This is a temporary solution.
+    """
+    for span in trace:
+        if "langchain" in span.get("attributes", {}).get("input.value", ""):
+            logger.info("Agent type is LANGCHAIN")
+            return AgentType.LANGCHAIN
+        if span.get("attributes", {}).get("smolagents.max_steps"):
+            logger.info("Agent type is SMOLAGENTS")
+            return AgentType.SMOLAGENTS
+    raise ValueError(
+        f"Could not determine agent type from trace, or agent type not supported"
+    )
 
 
 class EvaluationResult(BaseModel):
@@ -17,15 +38,6 @@ class EvaluationResult(BaseModel):
     reason: str
     criteria: str
     points: int
-
-
-def extract_hypothesis_answer(telemetry: List[Dict[str, Any]]) -> str | None:
-    """Extract the hypothesis agent final answer from the telemetry data"""
-    for span in reversed(telemetry):
-        if span.get("attributes", {}).get("openinference.span.kind") == "AGENT":
-            hypo = span.get("attributes", {}).get("output.value")
-            return hypo
-    raise ValueError("Final answer not found in telemetry")
 
 
 def evaluate_criterion(
@@ -109,6 +121,7 @@ def verify_checkpoints(
     telemetry: List[Dict[str, Any]],
     checkpoints: List[CheckpointCriteria],
     model: str,
+    agent_type: AgentType,
 ) -> List[EvaluationResult]:
     """Verify each checkpoint against the telemetry data using LLM
     These checkpoints do not take the ground truth or hyupothesis
@@ -117,9 +130,9 @@ def verify_checkpoints(
     """
     results = []
 
+    evidence = extract_evidence(telemetry, agent_type)
     for checkpoint in checkpoints:
         criteria = checkpoint.criteria
-        evidence = extract_relevant_evidence(telemetry, criteria)
 
         evaluation = evaluate_criterion(
             criteria=criteria,
@@ -156,62 +169,3 @@ def verify_hypothesis_answer(
         results.append(evaluation)
 
     return results
-
-
-def extract_relevant_evidence(telemetry: List[Dict[str, Any]], criteria: str) -> str:
-    """Extract relevant telemetry evidence based on the checkpoint criteria
-    TODO this is not a very robust implementation, since it requires knowledge about which tools have been
-    implemented. We should abstract this so that it can dynamically figure out what tools may have been used
-    and check for them appropriately. I understand that this tool should probably have some better way of abstracting
-    relevant information from the opentelemetry spans."""
-    evidence = ""
-
-    # Look for evidence of tool usage
-    if "DuckDuckGoSearchTool" in criteria:
-        search_spans = [
-            span for span in telemetry if span.get("name") == "DuckDuckGoSearchTool"
-        ]
-        evidence += f"Search tool was used {len(search_spans)} times.\n"
-        for i, span in enumerate(search_spans):  # Limit to first 3 searches
-            if "attributes" in span and "input.value" in span["attributes"]:
-                try:
-                    input_value = json.loads(span["attributes"]["input.value"])
-                    if "kwargs" in input_value and "query" in input_value["kwargs"]:
-                        evidence += (
-                            f"Search query {i + 1}: {input_value['kwargs']['query']}\n"
-                        )
-                except (json.JSONDecodeError, TypeError):
-                    pass
-
-    # Look for evidence of website fetching
-    if "fetched a website" in criteria:
-        fetch_spans = [
-            span
-            for span in telemetry
-            if span.get("attributes", {}).get("tool.name") == "fetch"
-        ]
-        evidence += f"Website fetch tool was used {len(fetch_spans)} times.\n"
-        for i, span in enumerate(fetch_spans):  # Limit to first 3 fetches
-            if "attributes" in span and "input.value" in span["attributes"]:
-                try:
-                    input_value = json.loads(span["attributes"]["input.value"])
-                    if "kwargs" in input_value and "url" in input_value["kwargs"]:
-                        evidence += (
-                            f"Fetched URL {i + 1}: {input_value['kwargs']['url']}\n"
-                        )
-                except (json.JSONDecodeError, TypeError):
-                    pass
-
-    # Add general evidence about all tool calls
-    tool_calls = {}
-    for span in telemetry:
-        if "name" in span and span["name"] not in tool_calls:
-            tool_calls[span["name"]] = 1
-        elif "name" in span:
-            tool_calls[span["name"]] += 1
-
-    evidence += "\nTool calls summary:\n"
-    for tool, count in tool_calls.items():
-        evidence += f"- {tool}: {count} call(s)\n"
-
-    return evidence
