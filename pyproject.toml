@@ -30,7 +30,7 @@ smolagents = [
 
 openai = [
   "openai-agents",
-  "openinference-instrumentation-openai-agents"
+  "openinference-instrumentation-openai-agents>=0.1.2"
 ]
 
 mcp = [

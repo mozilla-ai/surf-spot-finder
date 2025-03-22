@@ -54,10 +54,7 @@ def run_lanchain_agent(
     agent = create_react_agent(
         model=model,
         tools=imported_tools,
-        checkpointer=MemorySaver(),
-        config_schema={
-            "recursion_limit": 100,
-        },
+        checkpointer=MemorySaver()
     )
     for step in agent.stream(
         {"messages": [HumanMessage(content=prompt)]},

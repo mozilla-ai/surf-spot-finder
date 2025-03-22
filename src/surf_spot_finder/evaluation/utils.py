@@ -25,6 +25,11 @@ def determine_agent_type(trace: List[Dict[str, Any]]) -> AgentType:
         if span.get("attributes", {}).get("smolagents.max_steps"):
             logger.info("Agent type is SMOLAGENTS")
             return AgentType.SMOLAGENTS
+        # This is extremely fragile but there currently isn't
+        # any specific key to indicate the agent type
+        if span.get("name") == "response": 
+            logger.info("Agent type is OPENAI")
+            return AgentType.OPENAI
     raise ValueError(
         "Could not determine agent type from trace, or agent type not supported"
     )
@@ -131,6 +136,7 @@ def verify_checkpoints(
     results = []
 
     evidence = extract_evidence(telemetry, agent_type)
+    print(evidence)
     for checkpoint in checkpoints:
         criteria = checkpoint.criteria
 
