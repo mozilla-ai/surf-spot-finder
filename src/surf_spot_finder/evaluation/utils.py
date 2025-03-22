@@ -27,7 +27,7 @@ def determine_agent_type(trace: List[Dict[str, Any]]) -> AgentType:
             return AgentType.SMOLAGENTS
         # This is extremely fragile but there currently isn't
         # any specific key to indicate the agent type
-        if span.get("name") == "response": 
+        if span.get("name") == "response":
             logger.info("Agent type is OPENAI")
             return AgentType.OPENAI
     raise ValueError(

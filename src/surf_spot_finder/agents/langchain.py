@@ -52,9 +52,7 @@ def run_lanchain_agent(
 
     model = init_chat_model(model_id)
     agent = create_react_agent(
-        model=model,
-        tools=imported_tools,
-        checkpointer=MemorySaver()
+        model=model, tools=imported_tools, checkpointer=MemorySaver()
     )
     for step in agent.stream(
         {"messages": [HumanMessage(content=prompt)]},
