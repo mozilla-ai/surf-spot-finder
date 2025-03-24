@@ -4672,7 +4672,7 @@ Example output:</p>
 
 
 <h4 id="surf_spot_finder.tracing.get_tracer_provider" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">get_tracer_provider</span><span class="p">(</span><span class="n">project_name</span><span class="p">,</span> <span class="n">json_tracer</span><span class="p">,</span> <span class="n">agent_type</span><span class="p">,</span> <span class="n">output_dir</span><span class="o">=</span><span class="s1">&#39;telemetry_output&#39;</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">get_tracer_provider</span><span class="p">(</span><span class="n">project_name</span><span class="p">,</span> <span class="n">json_tracer</span><span class="p">,</span> <span class="n">agent_type</span><span class="p">,</span> <span class="n">output_dir</span><span class="o">=</span><span class="s1">&#39;output&#39;</span><span class="p">)</span></code>
 
 </h4>
 
@@ -4752,11 +4752,11 @@ Example output:</p>
               <div class="doc-md-description">
                 <p>The directory where the telemetry output will be stored.
 Only used if <code>json_tracer=True</code>.
-Defaults to "telemetry_output".</p>
+Defaults to "output".</p>
               </div>
             </td>
             <td>
-                  <code>&#39;telemetry_output&#39;</code>
+                  <code>&#39;output&#39;</code>
             </td>
           </tr>
       </tbody>
@@ -4841,7 +4841,7 @@ Defaults to "telemetry_output".</p>
 </span><span id="__span-0-46"><a id="__codelineno-0-46" name="__codelineno-0-46"></a>    <span class="n">project_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 </span><span id="__span-0-47"><a id="__codelineno-0-47" name="__codelineno-0-47"></a>    <span class="n">json_tracer</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
 </span><span id="__span-0-48"><a id="__codelineno-0-48" name="__codelineno-0-48"></a>    <span class="n">agent_type</span><span class="p">:</span> <span class="n">AgentType</span><span class="p">,</span>
-</span><span id="__span-0-49"><a id="__codelineno-0-49" name="__codelineno-0-49"></a>    <span class="n">output_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;telemetry_output&quot;</span><span class="p">,</span>
+</span><span id="__span-0-49"><a id="__codelineno-0-49" name="__codelineno-0-49"></a>    <span class="n">output_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;output&quot;</span><span class="p">,</span>
 </span><span id="__span-0-50"><a id="__codelineno-0-50" name="__codelineno-0-50"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">TracerProvider</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]:</span>
 </span><span id="__span-0-51"><a id="__codelineno-0-51" name="__codelineno-0-51"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="__span-0-52"><a id="__codelineno-0-52" name="__codelineno-0-52"></a><span class="sd">    Create a tracer_provider based on the selected mode.</span>
@@ -4852,7 +4852,7 @@ Defaults to "telemetry_output".</p>
 </span><span id="__span-0-57"><a id="__codelineno-0-57" name="__codelineno-0-57"></a><span class="sd">        agent_type: The type of agent being used.</span>
 </span><span id="__span-0-58"><a id="__codelineno-0-58" name="__codelineno-0-58"></a><span class="sd">        output_dir: The directory where the telemetry output will be stored.</span>
 </span><span id="__span-0-59"><a id="__codelineno-0-59" name="__codelineno-0-59"></a><span class="sd">            Only used if `json_tracer=True`.</span>
-</span><span id="__span-0-60"><a id="__codelineno-0-60" name="__codelineno-0-60"></a><span class="sd">            Defaults to &quot;telemetry_output&quot;.</span>
+</span><span id="__span-0-60"><a id="__codelineno-0-60" name="__codelineno-0-60"></a><span class="sd">            Defaults to &quot;output&quot;.</span>
 </span><span id="__span-0-61"><a id="__codelineno-0-61" name="__codelineno-0-61"></a>
 </span><span id="__span-0-62"><a id="__codelineno-0-62" name="__codelineno-0-62"></a><span class="sd">    Returns:</span>
 </span><span id="__span-0-63"><a id="__codelineno-0-63" name="__codelineno-0-63"></a><span class="sd">        tracer_provider: The configured tracer provider</span>
@@ -4918,7 +4918,7 @@ Defaults to "telemetry_output".</p>
             <td>
               <div class="doc-md-description">
                 <p>The configured tracer provider from
-<a class="autorefs autorefs-internal" title="get_tracer_provider(project_name, json_tracer, agent_type, output_dir='telemetry_output')" href="#surf_spot_finder.tracing.get_tracer_provider">get_tracer_provider</a>.</p>
+<a class="autorefs autorefs-internal" title="get_tracer_provider(project_name, json_tracer, agent_type, output_dir='output')" href="#surf_spot_finder.tracing.get_tracer_provider">get_tracer_provider</a>.</p>
               </div>
             </td>
             <td>
