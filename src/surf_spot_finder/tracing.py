@@ -43,7 +43,10 @@ class JsonFileSpanExporter(SpanExporter):
 
 
 def get_tracer_provider(
-    project_name: str, json_tracer: bool, agent_type: AgentType, output_dir: str = "telemetry_output"
+    project_name: str,
+    json_tracer: bool,
+    agent_type: AgentType,
+    output_dir: str = "telemetry_output",
 ) -> tuple[TracerProvider, str | None]:
     """
     Create a tracer_provider based on the selected mode.

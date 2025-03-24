@@ -24,7 +24,8 @@ try:
 except ImportError:
     agents_available = None
 
-DEFAULT_MAX_TURNS=20
+DEFAULT_MAX_TURNS = 20
+
 
 @logger.catch(reraise=True)
 def run_openai_agent(
@@ -179,6 +180,8 @@ def run_openai_multi_agent(
         ],
     )
 
-    result = Runner.run_sync(starting_agent=main_agent, input=prompt, max_turns=max_turns)
+    result = Runner.run_sync(
+        starting_agent=main_agent, input=prompt, max_turns=max_turns
+    )
     logger.info(result.final_output)
     return result
