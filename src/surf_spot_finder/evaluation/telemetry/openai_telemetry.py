@@ -70,7 +70,8 @@ class OpenAITelemetryProcessor(TelemetryProcessor):
                     "tool_name": tool_name,
                     "input": attributes.get("input.value", ""),
                     "output": tool_output,
-                    "status": span.get("status", {}).get("status_code"),
+                    # Can't add status yet because it isn't being set by openinference
+                    # "status": span.get("status", {}).get("status_code"),
                 }
                 span_info["input"] = json.loads(span_info["input"])
 
