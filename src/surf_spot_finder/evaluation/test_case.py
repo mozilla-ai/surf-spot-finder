@@ -42,10 +42,10 @@ class TestCase(BaseModel):
         """Load a test case from a YAML file and process it"""
         with open(test_case_path, "r") as f:
             test_case_dict = yaml.safe_load(f)
-        
+
         with open(agent_config_path, "r") as f:
             agent_config_dict = yaml.safe_load(f)
-        test_case_dict["agent"] = agent_config_dict['agent']
+        test_case_dict["agent"] = agent_config_dict["agent"]
         final_answer_criteria = []
 
         def add_gt_final_answer_criteria(ground_truth_list):
