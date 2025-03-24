@@ -167,4 +167,4 @@ cython_debug/
 .idea/
 .vscode/
 
-telemetry_output
+output

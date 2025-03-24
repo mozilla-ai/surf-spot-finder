@@ -46,7 +46,7 @@ def get_tracer_provider(
     project_name: str,
     json_tracer: bool,
     agent_type: AgentType,
-    output_dir: str = "telemetry_output",
+    output_dir: str = "output",
 ) -> tuple[TracerProvider, str | None]:
     """
     Create a tracer_provider based on the selected mode.
@@ -57,7 +57,7 @@ def get_tracer_provider(
         agent_type: The type of agent being used.
         output_dir: The directory where the telemetry output will be stored.
             Only used if `json_tracer=True`.
-            Defaults to "telemetry_output".
+            Defaults to "output".
 
     Returns:
         tracer_provider: The configured tracer provider

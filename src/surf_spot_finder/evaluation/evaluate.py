@@ -1,9 +1,11 @@
 import json
+import os
 import sys
 from textwrap import dedent
 from typing import Any, Dict, List, Optional
 from loguru import logger
 from fire import Fire
+import pandas as pd
 from surf_spot_finder.cli import find_surf_spot
 from surf_spot_finder.config import (
     Config,
@@ -53,9 +55,6 @@ def evaluate_telemetry(test_case: TestCase, telemetry_path: str) -> bool:
     # Extract the final answer from the telemetry
     processor = TelemetryProcessor.create(agent_type)
     hypothesis_answer = processor.extract_hypothesis_answer(trace=telemetry)
-    logger.info(
-        f"""<yellow>Hypothesis Final answer extracted: {hypothesis_answer}</yellow>"""
-    )
     # Verify agent behavior against checkpoints using llm-as-a-judge
     llm_judge = "openai/gpt-4o"
     checkpoint_results = verify_checkpoints(
@@ -72,6 +71,10 @@ def evaluate_telemetry(test_case: TestCase, telemetry_path: str) -> bool:
         model=llm_judge,
     )
     # Summarize results
+    output_message = ""
+    output_message += (
+        f"""<yellow>Hypothesis Final answer extracted: {hypothesis_answer}</yellow>\n"""
+    )
 
     verification_results = checkpoint_results + hypothesis_answer_results
     failed_checks = [r for r in verification_results if not r.passed]
@@ -86,7 +89,7 @@ def evaluate_telemetry(test_case: TestCase, telemetry_path: str) -> bool:
                 - {check.criteria}
                 - {check.reason}</green>"""
             )
-            logger.info(message)
+            output_message += message + "\n"
     if failed_checks:
         for check in failed_checks:
             message = dedent(
@@ -95,14 +98,41 @@ def evaluate_telemetry(test_case: TestCase, telemetry_path: str) -> bool:
                 - {check.criteria}
                 - {check.reason}</red>"""
             )
-            logger.error(message)
+            output_message += message + "\n"
     else:
-        logger.info("<green>All checkpoints passed!</green>")
-    logger.info(f"<green>Passed checkpoints: {len(passed_checks)}</green>")
-    logger.info(f"<red>Failed checkpoints: {len(failed_checks)}</red>")
-    logger.info("<green>=====================================</green>")
-    logger.info(f"<green>Score: {won_points}/{won_points + missed_points}</green>")
-    logger.info("<green>=====================================</green>")
+        output_message += "<green>All checkpoints passed!</green>\n"
+    output_message += f"<green>Passed checkpoints: {len(passed_checks)}</green>\n"
+    output_message += f"<red>Failed checkpoints: {len(failed_checks)}</red>\n"
+    output_message += "<green>=====================================</green>\n"
+    output_message += f"<green>Score: {won_points}/{won_points + missed_points}</green>\n"
+    output_message += "<green>=====================================</green>\n"
+    logger.info(output_message)
+    # See if the test_case.output_path file exists.
+    if os.path.exists(test_case.output_path):
+        df = pd.read_json(test_case.output_path, orient="records", lines=True)
+    else:
+        df = pd.DataFrame()
+    df = pd.concat(
+        [
+            df,
+            pd.DataFrame(
+                [
+                    {
+                        "test_case_path": test_case.test_case_path,
+                        "output_message": output_message,
+                        "telemetry_path": telemetry_path,
+                        "hypothesis_answer": hypothesis_answer,
+                        "passed_checks": len(passed_checks),
+                        "failed_checks": len(failed_checks),
+                        "score": round(
+                            won_points / (won_points + missed_points) * 100, 2
+                        ),
+                    }
+                ]
+            ),
+        ]
+    )
+    df.to_json(test_case.output_path, orient="records", lines=True)
 
 
 def evaluate(
@@ -123,9 +153,9 @@ def evaluate(
         logger.info(
             "No telemetry path provided. Running agent to generate telemetry..."
         )
-        assert (
-            agent_config_path is not None
-        ), "Agent config path must be provided if running agent"
+        assert agent_config_path is not None, (
+            "Agent config path must be provided if running agent"
+        )
         telemetry_path = run_agent(test_case, agent_config_path)
     else:
         logger.info(f"Using provided telemetry file: {telemetry_path}")

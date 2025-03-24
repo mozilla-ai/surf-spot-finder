@@ -20,8 +20,15 @@ class LangchainTelemetryProcessor(TelemetryProcessor):
                 message = json.loads(content)["messages"][0]
                 message = self.parse_generic_key_value_string(message)
                 base_message = BaseMessage(content=message["content"], type="AGENT")
-                print(base_message.text())
-                return base_message.text()
+                # Use the interpreted string for printing
+                final_text = base_message.text()
+                # Either decode escape sequences if they're present
+                try:
+                    final_text = final_text.encode().decode('unicode_escape')
+                except UnicodeDecodeError:
+                    # If that fails, the escape sequences might already be interpreted
+                    pass
+                return final_text
 
         raise ValueError("No agent final answer found in trace")
 

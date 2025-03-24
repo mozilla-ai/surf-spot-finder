@@ -27,6 +27,8 @@ class TestCase(BaseModel):
     ground_truth: List[Dict[str, Any]] = Field(default_factory=list)
     checkpoints: List[CheckpointCriteria] = Field(default_factory=list)
     final_answer_criteria: List[CheckpointCriteria] = Field(default_factory=list)
+    test_case_path: str
+    output_path: str = "output/results.json"
 
     @classmethod
     def from_yaml(cls, test_case_path: str) -> "TestCase":
@@ -55,5 +57,7 @@ class TestCase(BaseModel):
         test_case_dict["ground_truth"] = [
             item for item in test_case_dict["ground_truth"] if isinstance(item, dict)
         ]
+
+        test_case_dict["test_case_path"] = test_case_path
 
         return cls.model_validate(test_case_dict)
