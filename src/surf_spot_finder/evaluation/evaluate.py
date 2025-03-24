@@ -24,18 +24,19 @@ logger.add(sys.stdout, colorize=True, format="{message}")
 
 def run_agent(test_case: TestCase) -> str:
     input_data = test_case.input
+    agent_config = test_case.agent
     logger.info("Loading config")
     config = Config(
         location=input_data.location,
         date=input_data.date,
         max_driving_hours=input_data.max_driving_hours,
-        model_id=input_data.model_id,
-        api_key_var=input_data.api_key_var,
+        model_id=agent_config.model_id,
+        api_key_var=agent_config.api_key_var,
         prompt=INPUT_PROMPT,
         json_tracer=input_data.json_tracer,
-        api_base=input_data.api_base,
-        agent_type=input_data.agent_type,
-        tools=input_data.tools,
+        api_base=agent_config.api_base,
+        agent_type=agent_config.agent_type,
+        tools=agent_config.tools,
     )
     return find_surf_spot(
         location=config.location,

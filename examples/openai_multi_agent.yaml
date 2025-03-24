@@ -1,6 +1,8 @@
-location: Pontevedra
-date: 2025-03-22 12:00
-max_driving_hours: 2
-model_id: o3-mini
-agent_type: openai_multi_agent
+input:
+  location: Pontevedra
+  date: 2025-03-27 12:00
+  max_driving_hours: 2
+agent:
+  model_id: o3-mini
+  agent_type: openai_multi_agent
 # input_prompt_template:

@@ -10,9 +10,12 @@ class InputModel(BaseModel):
     location: str
     date: str
     max_driving_hours: int
+    json_tracer: bool
+
+
+class AgentModel(BaseModel):
     model_id: str
     api_key_var: str
-    json_tracer: bool
     api_base: Optional[str] = None
     agent_type: str
     tools: Optional[List[str]] = None
@@ -29,6 +32,7 @@ class CheckpointCriteria(BaseModel):
 class TestCase(BaseModel):
     model_config = ConfigDict(extra="forbid")
     input: InputModel
+    agent: AgentModel
     ground_truth: List[Dict[str, Any]] = Field(default_factory=list)
     checkpoints: List[CheckpointCriteria] = Field(default_factory=list)
     final_answer_criteria: List[CheckpointCriteria] = Field(default_factory=list)

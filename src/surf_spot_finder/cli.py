@@ -1,7 +1,5 @@
-from pathlib import Path
 from typing import Optional
 
-import yaml
 from fire import Fire
 from loguru import logger
 
@@ -55,7 +53,7 @@ def find_surf_spot(
     """
     if from_config:
         logger.info(f"Loading {from_config}")
-        config = Config.model_validate(yaml.safe_load(Path(from_config).read_text()))
+        config = Config.from_yaml(from_config)
     else:
         config = Config(
             location=location,

@@ -1,5 +1,6 @@
 from typing import Annotated, Optional
 from pydantic import AfterValidator, BaseModel, FutureDatetime, PositiveInt
+import yaml
 
 from surf_spot_finder.prompts.shared import INPUT_PROMPT
 
@@ -31,3 +32,30 @@ class Config(BaseModel):
     json_tracer: bool = True
     api_base: Optional[str] = None
     tools: Optional[list[str]] = None
+
+    @classmethod
+    def from_yaml(cls, yaml_path: str) -> "Config":
+        """
+        Create a Config instance from a YAML file.
+
+        Args:
+            yaml_path: Path to the YAML configuration file
+
+        Returns:
+            Config: A new Config instance populated with values from the YAML file
+        """
+        with open(yaml_path, "r") as f:
+            data = yaml.safe_load(f)
+
+        # Extract and flatten the nested structure
+        config_dict = {}
+
+        # Add input parameters
+        if "input" in data:
+            config_dict.update(data["input"])
+
+        # Add agent parameters
+        if "agent" in data:
+            config_dict.update(data["agent"])
+        # Create instance from the flattened dictionary
+        return cls(**config_dict)
