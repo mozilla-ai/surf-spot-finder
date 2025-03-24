@@ -88,5 +88,5 @@ def get_surfing_spots(
     return [
         (element.get("tags", {}).get("name", ""), get_lat_lon_center(element["bounds"]))
         for element in elements
-        if "surfing" in element.get("tags", {}).get("sport", "")
+        if "surfing" in element.get("tags", {}).get("sport", "") and "bounds" in element
     ]
