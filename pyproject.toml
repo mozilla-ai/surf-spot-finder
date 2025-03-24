@@ -10,7 +10,6 @@ requires-python = ">=3.10"
 dynamic = ["version"]
 dependencies = [
   "fire",
-  "langchain-openai>=0.3.9",
   "loguru",
   "opentelemetry-exporter-otlp",
   "opentelemetry-sdk",
@@ -21,6 +20,7 @@ dependencies = [
 langchain = [
   "langchain",
   "langgraph",
+  "langchain-openai>=0.3.9",
   "openinference-instrumentation-langchain"
 ]
 smolagents = [
