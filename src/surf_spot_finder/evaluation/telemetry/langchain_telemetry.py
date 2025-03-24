@@ -24,7 +24,7 @@ class LangchainTelemetryProcessor(TelemetryProcessor):
                 final_text = base_message.text()
                 # Either decode escape sequences if they're present
                 try:
-                    final_text = final_text.encode().decode('unicode_escape')
+                    final_text = final_text.encode().decode("unicode_escape")
                 except UnicodeDecodeError:
                     # If that fails, the escape sequences might already be interpreted
                     pass

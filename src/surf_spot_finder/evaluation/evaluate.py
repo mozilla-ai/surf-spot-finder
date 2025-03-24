@@ -104,7 +104,9 @@ def evaluate_telemetry(test_case: TestCase, telemetry_path: str) -> bool:
     output_message += f"<green>Passed checkpoints: {len(passed_checks)}</green>\n"
     output_message += f"<red>Failed checkpoints: {len(failed_checks)}</red>\n"
     output_message += "<green>=====================================</green>\n"
-    output_message += f"<green>Score: {won_points}/{won_points + missed_points}</green>\n"
+    output_message += (
+        f"<green>Score: {won_points}/{won_points + missed_points}</green>\n"
+    )
     output_message += "<green>=====================================</green>\n"
     logger.info(output_message)
     # See if the test_case.output_path file exists.
@@ -153,9 +155,9 @@ def evaluate(
         logger.info(
             "No telemetry path provided. Running agent to generate telemetry..."
         )
-        assert agent_config_path is not None, (
-            "Agent config path must be provided if running agent"
-        )
+        assert (
+            agent_config_path is not None
+        ), "Agent config path must be provided if running agent"
         telemetry_path = run_agent(test_case, agent_config_path)
     else:
         logger.info(f"Using provided telemetry file: {telemetry_path}")
