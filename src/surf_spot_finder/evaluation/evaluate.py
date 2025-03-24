@@ -115,7 +115,9 @@ def evaluate_telemetry(test_case: TestCase, telemetry_path: str) -> bool:
     logger.info("<green>=====================================</green>")
 
 
-def evaluate(test_case_path: str, telemetry_path: Optional[str] = None) -> None:
+def evaluate(
+    test_case_path: str, agent_config_path: str, telemetry_path: Optional[str] = None
+) -> None:
     """
     Evaluate agent performance using either a provided telemetry file or by running the agent.
 
@@ -123,7 +125,9 @@ def evaluate(test_case_path: str, telemetry_path: Optional[str] = None) -> None:
         telemetry_path: Optional path to an existing telemetry file. If not provided,
                         the agent will be run to generate one.
     """
-    test_case = TestCase.from_yaml(test_case_path)
+    test_case = TestCase.from_yaml(
+        test_case_path=test_case_path, agent_config_path=agent_config_path
+    )
 
     if telemetry_path is None:
         logger.info(
