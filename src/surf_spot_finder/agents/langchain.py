@@ -51,8 +51,11 @@ def run_lanchain_agent(
         if not isinstance(imported_tool, BaseTool):
             imported_tool = tool(imported_tool)
         imported_tools.append((imported_tool))
-
-    model = init_chat_model(model_id)
+    if "/" in model_id:
+        model_provider, model_id = model_id.split("/")
+        model = init_chat_model(model_id, model_provider=model_provider)
+    else:
+        model = init_chat_model(model_id)
     agent = create_react_agent(
         model=model, tools=imported_tools, checkpointer=MemorySaver()
     )

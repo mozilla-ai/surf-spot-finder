@@ -21,6 +21,7 @@ langchain = [
   "langchain",
   "langgraph",
   "langchain-openai>=0.3.9",
+  "langchain-ollama>=0.3.0",
   "openinference-instrumentation-langchain"
 ]
 smolagents = [

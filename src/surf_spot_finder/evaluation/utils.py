@@ -4,35 +4,10 @@ import re
 
 from litellm import completion
 from textwrap import dedent
-from loguru import logger
 
 from pydantic import BaseModel, ConfigDict
-from surf_spot_finder.evaluation.telemetry_utils import extract_evidence
+from surf_spot_finder.evaluation.telemetry import TelemetryProcessor
 from surf_spot_finder.evaluation.test_case import CheckpointCriteria
-
-from surf_spot_finder.agents import AgentType
-
-
-def determine_agent_type(trace: List[Dict[str, Any]]) -> AgentType:
-    """Determine the agent type based on the trace.
-    These are not really stable ways to find it, because we're waiting on some
-    reliable method for determining the agent type. This is a temporary solution.
-    """
-    for span in trace:
-        if "langchain" in span.get("attributes", {}).get("input.value", ""):
-            logger.info("Agent type is LANGCHAIN")
-            return AgentType.LANGCHAIN
-        if span.get("attributes", {}).get("smolagents.max_steps"):
-            logger.info("Agent type is SMOLAGENTS")
-            return AgentType.SMOLAGENTS
-        # This is extremely fragile but there currently isn't
-        # any specific key to indicate the agent type
-        if span.get("name") == "response":
-            logger.info("Agent type is OPENAI")
-            return AgentType.OPENAI
-    raise ValueError(
-        "Could not determine agent type from trace, or agent type not supported"
-    )
 
 
 class EvaluationResult(BaseModel):
@@ -126,7 +101,7 @@ def verify_checkpoints(
     telemetry: List[Dict[str, Any]],
     checkpoints: List[CheckpointCriteria],
     model: str,
-    agent_type: AgentType,
+    processor: TelemetryProcessor,
 ) -> List[EvaluationResult]:
     """Verify each checkpoint against the telemetry data using LLM
     These checkpoints do not take the ground truth or hyupothesis
@@ -134,8 +109,7 @@ def verify_checkpoints(
     the specific criteria mentioned.
     """
     results = []
-
-    evidence = extract_evidence(telemetry, agent_type)
+    evidence = processor.extract_evidence(telemetry)
     print(evidence)
     for checkpoint in checkpoints:
         criteria = checkpoint.criteria

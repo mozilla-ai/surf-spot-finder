@@ -5,6 +5,7 @@ input:
   # input_prompt_template:
 agent:
   model_id: o3-mini
+  # model_id: ollama/llama3.2:3b
   agent_type: langchain
   tools:
   - "surf_spot_finder.tools.driving_hours_to_meters"
