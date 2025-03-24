@@ -2,6 +2,7 @@ from unittest.mock import patch, MagicMock
 
 import pytest
 
+from surf_spot_finder.agents import AgentType
 from surf_spot_finder.tracing import get_tracer_provider, setup_tracing
 
 
@@ -17,6 +18,7 @@ def test_get_tracer_provider(tmp_path, json_tracer):
         get_tracer_provider(
             project_name="test_project",
             json_tracer=json_tracer,
+            agent_type=AgentType.SMOLAGENTS,
             output_dir=tmp_path / "telemetry",
         )
         assert (tmp_path / "telemetry").exists() == json_tracer

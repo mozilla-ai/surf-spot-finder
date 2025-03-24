@@ -4,6 +4,8 @@ from datetime import datetime
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import SimpleSpanProcessor, SpanExporter
 
+from surf_spot_finder.agents import AgentType
+
 
 class JsonFileSpanExporter(SpanExporter):
     def __init__(self, file_name: str):
@@ -41,7 +43,7 @@ class JsonFileSpanExporter(SpanExporter):
 
 
 def get_tracer_provider(
-    project_name: str, json_tracer: bool, output_dir: str = "telemetry_output"
+    project_name: str, json_tracer: bool, agent_type: AgentType, output_dir: str = "telemetry_output"
 ) -> tuple[TracerProvider, str | None]:
     """
     Create a tracer_provider based on the selected mode.
@@ -49,6 +51,7 @@ def get_tracer_provider(
     Args:
         project_name: Name of the project for tracing
         json_tracer: Whether to use the custom JSON file exporter (True) or Phoenix (False)
+        agent_type: The type of agent being used.
         output_dir: The directory where the telemetry output will be stored.
             Only used if `json_tracer=True`.
             Defaults to "telemetry_output".
@@ -63,7 +66,7 @@ def get_tracer_provider(
         timestamp = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
 
         tracer_provider = TracerProvider()
-        file_name = f"{output_dir}/{project_name}-{timestamp}.json"
+        file_name = f"{output_dir}/{agent_type}-{project_name}-{timestamp}.json"
         json_file_exporter = JsonFileSpanExporter(file_name=file_name)
         span_processor = SimpleSpanProcessor(json_file_exporter)
         tracer_provider.add_span_processor(span_processor)

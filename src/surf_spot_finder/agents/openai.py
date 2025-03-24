@@ -24,6 +24,7 @@ try:
 except ImportError:
     agents_available = None
 
+DEFAULT_MAX_TURNS=20
 
 @logger.catch(reraise=True)
 def run_openai_agent(
@@ -34,6 +35,7 @@ def run_openai_agent(
     api_key_var: Optional[str] = None,
     api_base: Optional[str] = None,
     tools: Optional[list[str]] = None,
+    max_turns: Optional[int] = DEFAULT_MAX_TURNS,
 ) -> RunResult:
     """Runs an OpenAI agent with the given prompt and configuration.
 
@@ -94,7 +96,7 @@ def run_openai_agent(
             name=name,
             tools=imported_tools,
         )
-    result = Runner.run_sync(agent, prompt)
+    result = Runner.run_sync(starting_agent=agent, input=prompt, max_turns=max_turns)
     logger.info(result.final_output)
     return result
 
@@ -105,6 +107,7 @@ def run_openai_multi_agent(
     prompt: str,
     name: str = "surf-spot-finder",
     instructions: Optional[str] = MULTI_AGENT_SYSTEM_PROMPT,
+    max_turns: Optional[int] = DEFAULT_MAX_TURNS,
     **kwargs,
 ) -> RunResult:
     """Runs multiple OpenAI agents orchestrated by a main agent.
@@ -176,6 +179,6 @@ def run_openai_multi_agent(
         ],
     )
 
-    result = Runner.run_sync(main_agent, prompt)
+    result = Runner.run_sync(starting_agent=main_agent, input=prompt, max_turns=max_turns)
     logger.info(result.final_output)
     return result

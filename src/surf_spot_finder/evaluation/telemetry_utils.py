@@ -191,11 +191,6 @@ def _extract_langchain_data(telemetry: List[Dict[str, Any]]) -> List:
                 "model": attributes.get("llm.model_name", "Unknown model"),
                 "input": attributes.get("llm.input_messages.0.message.content", ""),
                 "output": attributes.get("llm.output_messages.0.message.content", ""),
-                "tokens": {
-                    "input": attributes.get("llm.token_count.prompt", 0),
-                    "output": attributes.get("llm.token_count.completion", 0),
-                    "total": attributes.get("llm.token_count.total", 0),
-                },
                 "type": "reasoning",
             }
             calls.append(llm_info)
@@ -220,7 +215,9 @@ def _extract_langchain_data(telemetry: List[Dict[str, Any]]) -> List:
                     tool_info["input"] = attributes["input.value"]
 
             if "output.value" in attributes:
-                tool_info["output"] = attributes["output.value"]
+                tool_info["output"] = parse_generic_key_value_string(
+                    json.loads(attributes["output.value"])["output"]
+                )["content"]
 
             calls.append(tool_info)
 
@@ -238,59 +235,44 @@ def _extract_openai_data(telemetry: List[Dict[str, Any]]) -> list:
         attributes = span.get("attributes", {})
         span_kind = attributes.get("openinference.span.kind", "")
 
-        # Collect LLM interactions
-        if span_kind == "LLM" and "output.value" in attributes:
-            try:
-                output_data = json.loads(attributes["output.value"])
+        # Collect LLM interactions - look for direct message content first
+        if span_kind == "LLM":
+            # Initialize the LLM info dictionary
+            span_info = {}
 
-                # Extract reasoning from the LLM output
-                if "output" in output_data:
-                    for item in output_data.get("output", []):
-                        if item.get("type") == "reasoning":
-                            llm_info = {
-                                "model": output_data.get("model", "Unknown model"),
-                                "reasoning_id": item.get("id", ""),
-                                "token_usage": output_data.get("usage", {}),
-                                "output": item.get("content", ""),
-                                "type": "reasoning",
-                            }
-                            calls.append(llm_info)
+            # Try to get input message
+            input_key = "llm.input_messages.1.message.content"  # User message is usually at index 1
+            if input_key in attributes:
+                span_info["input"] = attributes[input_key]
 
-                        # Extract tool calls from the LLM output
-                        if item.get("type") == "function_call":
-                            tool_info = {
-                                "tool_name": item.get("name", "Unknown tool"),
-                                "call_id": item.get("call_id", ""),
-                                "arguments": item.get("arguments", "{}"),
-                                "status": item.get("status", "Unknown"),
-                            }
-                            calls.append(tool_info)
-            except (json.JSONDecodeError, KeyError):
-                pass
-
-        # Collect direct tool executions
-        if span_kind == "TOOL":
-            tool_name = attributes.get("tool.name", "Unknown tool")
-
-            tool_info = {
-                "tool_name": tool_name,
-                "input": attributes.get("input.value", ""),
-                "output": attributes.get("output.value", ""),
-                "status": "success"
-                if span.get("status", {}).get("status_code") != "ERROR"
-                else "error",
-            }
-
-            # Match with any previously extracted tool call
-            matched = False
-            for tc in calls:
-                if tc.get("tool_name") == tool_name and "result" not in tc:
-                    tc["result"] = tool_info["output"]
-                    matched = True
+            # Try to get output message directly
+            output_content = None
+            # Try in multiple possible locations
+            for key in [
+                "llm.output_messages.0.message.content",
+                "llm.output_messages.0.message.contents.0.message_content.text",
+            ]:
+                if key in attributes:
+                    output_content = attributes[key]
                     break
 
-            if not matched:
-                calls.append(tool_info)
+            # If we found direct output content, use it
+            if output_content:
+                span_info["output"] = output_content
+                calls.append(span_info)
+        elif span_kind == "TOOL":
+            tool_name = attributes.get("tool.name", "Unknown tool")
+            tool_output = attributes.get("output.value", "")
+
+            span_info = {
+                "tool_name": tool_name,
+                "input": attributes.get("input.value", ""),
+                "output": tool_output,
+                "status": span.get("status", {}).get("status_code"),
+            }
+            span_info["input"] = json.loads(span_info["input"])
+
+            calls.append(span_info)
 
     return calls
 
@@ -301,8 +283,9 @@ def _format_evidence(calls: List[Dict], agent_type: AgentType) -> str:
 
     for idx, call in enumerate(calls, start=1):
         evidence += f"### Call {idx}\n"
-        # truncate any values that are too long, if the value exists
-        max_length = 200
+
+        # Truncate any values that are too long
+        max_length = 400
         call = {
             k: (
                 v[:max_length] + "..."
@@ -311,6 +294,8 @@ def _format_evidence(calls: List[Dict], agent_type: AgentType) -> str:
             )
             for k, v in call.items()
         }
-        evidence += json.dumps(call, indent=2) + "\n\n"
+
+        # Use ensure_ascii=False to prevent escaping Unicode characters
+        evidence += json.dumps(call, indent=2, ensure_ascii=False) + "\n\n"
 
     return evidence
