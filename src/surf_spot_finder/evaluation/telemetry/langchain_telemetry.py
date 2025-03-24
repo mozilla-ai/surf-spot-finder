@@ -1,4 +1,3 @@
-
 from typing import Any, Dict, List
 import json
 from langchain_core.messages import BaseMessage
@@ -6,12 +5,13 @@ from langchain_core.messages import BaseMessage
 from surf_spot_finder.agents import AgentType
 from surf_spot_finder.evaluation.telemetry import TelemetryProcessor
 
+
 class LangchainTelemetryProcessor(TelemetryProcessor):
     """Processor for Langchain agent telemetry data."""
-    
+
     def _get_agent_type(self) -> AgentType:
         return AgentType.LANGCHAIN
-    
+
     def extract_hypothesis_answer(self, trace: List[Dict[str, Any]]) -> str:
         for span in reversed(trace):
             if span["attributes"]["openinference.span.kind"] == "AGENT":
@@ -19,12 +19,12 @@ class LangchainTelemetryProcessor(TelemetryProcessor):
                 # Extract content from serialized langchain message
                 message = json.loads(content)["messages"][0]
                 message = self.parse_generic_key_value_string(message)
-                base_message = BaseMessage(content=message['content'], type="AGENT")
+                base_message = BaseMessage(content=message["content"], type="AGENT")
                 print(base_message.text())
                 return base_message.text()
-        
+
         raise ValueError("No agent final answer found in trace")
-    
+
     def _extract_telemetry_data(self, telemetry: List[Dict[str, Any]]) -> List[Dict]:
         """Extract LLM calls and tool calls from LangChain telemetry."""
         calls = []
@@ -37,11 +37,16 @@ class LangchainTelemetryProcessor(TelemetryProcessor):
             span_kind = attributes.get("openinference.span.kind", "")
 
             # Collect LLM calls
-            if span_kind == "LLM" and "llm.output_messages.0.message.content" in attributes:
+            if (
+                span_kind == "LLM"
+                and "llm.output_messages.0.message.content" in attributes
+            ):
                 llm_info = {
                     "model": attributes.get("llm.model_name", "Unknown model"),
                     "input": attributes.get("llm.input_messages.0.message.content", ""),
-                    "output": attributes.get("llm.output_messages.0.message.content", ""),
+                    "output": attributes.get(
+                        "llm.output_messages.0.message.content", ""
+                    ),
                     "type": "reasoning",
                 }
                 calls.append(llm_info)
@@ -73,4 +78,3 @@ class LangchainTelemetryProcessor(TelemetryProcessor):
                 calls.append(tool_info)
 
         return calls
-

@@ -4,20 +4,21 @@ import json
 from surf_spot_finder.agents import AgentType
 from surf_spot_finder.evaluation.telemetry import TelemetryProcessor
 
+
 class SmolagentsTelemetryProcessor(TelemetryProcessor):
     """Processor for SmoL Agents telemetry data."""
-    
+
     def _get_agent_type(self) -> AgentType:
         return AgentType.SMOLAGENTS
-    
+
     def extract_hypothesis_answer(self, trace: List[Dict[str, Any]]) -> str:
         for span in reversed(trace):
             if span["attributes"]["openinference.span.kind"] == "AGENT":
                 content = span["attributes"]["output.value"]
                 return content
-                
+
         raise ValueError("No agent final answer found in trace")
-    
+
     def _extract_telemetry_data(self, telemetry: List[Dict[str, Any]]) -> List[Dict]:
         """Extract LLM calls and tool calls from SmoL Agents telemetry."""
         calls = []
@@ -30,7 +31,9 @@ class SmolagentsTelemetryProcessor(TelemetryProcessor):
             attributes = span["attributes"]
 
             # Extract tool information
-            if "tool.name" in attributes or span.get("name", "").startswith("SimpleTool"):
+            if "tool.name" in attributes or span.get("name", "").startswith(
+                "SimpleTool"
+            ):
                 tool_info = {
                     "tool_name": attributes.get(
                         "tool.name", span.get("name", "Unknown tool")

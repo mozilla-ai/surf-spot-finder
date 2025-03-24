@@ -8,24 +8,33 @@ from surf_spot_finder.agents import AgentType
 
 class TelemetryProcessor(ABC):
     """Base class for processing telemetry data from different agent types."""
-    
+
     MAX_EVIDENCE_LENGTH: ClassVar[int] = 400
-    
+
     @classmethod
-    def create(cls, agent_type: AgentType) -> 'TelemetryProcessor':
+    def create(cls, agent_type: AgentType) -> "TelemetryProcessor":
         """Factory method to create the appropriate telemetry processor."""
         if agent_type == AgentType.LANGCHAIN:
-            from surf_spot_finder.evaluation.telemetry.langchain_telemetry import LangchainTelemetryProcessor
+            from surf_spot_finder.evaluation.telemetry.langchain_telemetry import (
+                LangchainTelemetryProcessor,
+            )
+
             return LangchainTelemetryProcessor()
         elif agent_type == AgentType.SMOLAGENTS:
-            from surf_spot_finder.evaluation.telemetry.smolagents_telemetry import SmolagentsTelemetryProcessor
+            from surf_spot_finder.evaluation.telemetry.smolagents_telemetry import (
+                SmolagentsTelemetryProcessor,
+            )
+
             return SmolagentsTelemetryProcessor()
         elif agent_type == AgentType.OPENAI:
-            from surf_spot_finder.evaluation.telemetry.openai_telemetry import OpenAITelemetryProcessor
+            from surf_spot_finder.evaluation.telemetry.openai_telemetry import (
+                OpenAITelemetryProcessor,
+            )
+
             return OpenAITelemetryProcessor()
         else:
             raise ValueError(f"Unsupported agent type {agent_type}")
-        
+
     @staticmethod
     def determine_agent_type(trace: List[Dict[str, Any]]) -> AgentType:
         """Determine the agent type based on the trace.
@@ -47,22 +56,22 @@ class TelemetryProcessor(ABC):
         raise ValueError(
             "Could not determine agent type from trace, or agent type not supported"
         )
-    
+
     @abstractmethod
     def extract_hypothesis_answer(self, trace: List[Dict[str, Any]]) -> str:
         """Extract the hypothesis agent final answer from the trace."""
         pass
-    
+
     @abstractmethod
     def _extract_telemetry_data(self, telemetry: List[Dict[str, Any]]) -> List[Dict]:
         """Extract the agent-specific data from telemetry."""
         pass
-    
+
     def extract_evidence(self, telemetry: List[Dict[str, Any]]) -> str:
         """Extract relevant telemetry evidence."""
         calls = self._extract_telemetry_data(telemetry)
         return self._format_evidence(calls)
-    
+
     def _format_evidence(self, calls: List[Dict]) -> str:
         """Format extracted data into a standardized output format."""
         evidence = f"## {self._get_agent_type().name} Agent Execution\n\n"
@@ -73,7 +82,7 @@ class TelemetryProcessor(ABC):
             # Truncate any values that are too long
             call = {
                 k: (
-                    v[:self.MAX_EVIDENCE_LENGTH] + "..."
+                    v[: self.MAX_EVIDENCE_LENGTH] + "..."
                     if isinstance(v, str) and len(v) > self.MAX_EVIDENCE_LENGTH
                     else v
                 )
@@ -84,12 +93,12 @@ class TelemetryProcessor(ABC):
             evidence += json.dumps(call, indent=2, ensure_ascii=False) + "\n\n"
 
         return evidence
-    
+
     @abstractmethod
     def _get_agent_type(self) -> AgentType:
         """Get the agent type associated with this processor."""
         pass
-    
+
     @staticmethod
     def parse_generic_key_value_string(text: str) -> Dict[str, str]:
         """

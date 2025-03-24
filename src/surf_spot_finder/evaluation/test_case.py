@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Any
 from pydantic import BaseModel, Field, ConfigDict
 import yaml
 
@@ -11,6 +11,7 @@ class InputModel(BaseModel):
     date: str
     max_driving_hours: int
     json_tracer: bool
+
 
 class CheckpointCriteria(BaseModel):
     """Represents a checkpoint criteria with a description"""

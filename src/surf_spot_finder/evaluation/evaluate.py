@@ -52,9 +52,7 @@ def evaluate_telemetry(test_case: TestCase, telemetry_path: str) -> bool:
 
     # Extract the final answer from the telemetry
     processor = TelemetryProcessor.create(agent_type)
-    hypothesis_answer = processor.extract_hypothesis_answer(
-        trace=telemetry
-    )
+    hypothesis_answer = processor.extract_hypothesis_answer(trace=telemetry)
     logger.info(
         f"""<yellow>Hypothesis Final answer extracted: {hypothesis_answer}</yellow>"""
     )
@@ -125,9 +123,9 @@ def evaluate(
         logger.info(
             "No telemetry path provided. Running agent to generate telemetry..."
         )
-        assert agent_config_path is not None, (
-            "Agent config path must be provided if running agent"
-        )
+        assert (
+            agent_config_path is not None
+        ), "Agent config path must be provided if running agent"
         telemetry_path = run_agent(test_case, agent_config_path)
     else:
         logger.info(f"Using provided telemetry file: {telemetry_path}")

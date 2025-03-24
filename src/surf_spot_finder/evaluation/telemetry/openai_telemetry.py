@@ -7,10 +7,10 @@ from surf_spot_finder.evaluation.telemetry import TelemetryProcessor
 
 class OpenAITelemetryProcessor(TelemetryProcessor):
     """Processor for OpenAI agent telemetry data."""
-    
+
     def _get_agent_type(self) -> AgentType:
         return AgentType.OPENAI
-    
+
     def extract_hypothesis_answer(self, trace: List[Dict[str, Any]]) -> str:
         for span in reversed(trace):
             # Looking for the final response that has the summary answer
@@ -23,9 +23,9 @@ class OpenAITelemetryProcessor(TelemetryProcessor):
                 )
                 if output_key in span["attributes"]:
                     return span["attributes"][output_key]
-                    
+
         raise ValueError("No agent final answer found in trace")
-    
+
     def _extract_telemetry_data(self, telemetry: List[Dict[str, Any]]) -> list:
         """Extract LLM calls and tool calls from OpenAI telemetry."""
         calls = []
@@ -80,7 +80,9 @@ class OpenAITelemetryProcessor(TelemetryProcessor):
 
 
 # Backward compatibility functions that use the new class structure
-def extract_hypothesis_answer(trace: List[Dict[str, Any]], agent_type: AgentType) -> str:
+def extract_hypothesis_answer(
+    trace: List[Dict[str, Any]], agent_type: AgentType
+) -> str:
     """Extract the hypothesis agent final answer from the trace"""
     processor = TelemetryProcessor.create(agent_type)
     return processor.extract_hypothesis_answer(trace)
