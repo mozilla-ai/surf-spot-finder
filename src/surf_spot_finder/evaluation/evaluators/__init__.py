@@ -1,9 +1,9 @@
 from .CheckpointEvaluator import CheckpointEvaluator
-from .DirectAnswerEvaluator import DirectAnswerEvaluator
+from .QuestionAnsweringSquadEvaluator import QuestionAnsweringSquadEvaluator
 from .HypothesisEvaluator import HypothesisEvaluator
 
 __all__ = [
     "CheckpointEvaluator",
-    "DirectAnswerEvaluator",
+    "QuestionAnsweringSquadEvaluator",
     "HypothesisEvaluator",
 ]

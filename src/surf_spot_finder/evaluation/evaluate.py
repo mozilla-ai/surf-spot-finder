@@ -13,7 +13,7 @@ from surf_spot_finder.config import (
 from surf_spot_finder.evaluation.telemetry import TelemetryProcessor
 from surf_spot_finder.evaluation.evaluators import (
     CheckpointEvaluator,
-    DirectAnswerEvaluator,
+    QuestionAnsweringSquadEvaluator,
     HypothesisEvaluator,
 )
 from surf_spot_finder.evaluation.test_case import TestCase
@@ -74,7 +74,7 @@ def evaluate_telemetry(test_case: TestCase, telemetry_path: str) -> bool:
     )
 
     # Direct answer evaluation (new)
-    direct_evaluator = DirectAnswerEvaluator()
+    direct_evaluator = QuestionAnsweringSquadEvaluator()
     direct_results = direct_evaluator.evaluate(
         hypothesis_answer=hypothesis_answer,
         ground_truth_answer=test_case.ground_truth,

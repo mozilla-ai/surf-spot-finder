@@ -3,7 +3,7 @@ import evaluate
 from surf_spot_finder.evaluation.evaluators.schemas import EvaluationResult
 
 
-class DirectAnswerEvaluator:
+class QuestionAnsweringSquadEvaluator:
     """Directly compares answers without using LLM-as-judge"""
 
     def __init__(self):
