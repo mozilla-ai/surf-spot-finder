@@ -1,5 +1,6 @@
 from pydantic import BaseModel, ConfigDict
 
+
 class EvaluationResult(BaseModel):
     """Represents the result of evaluating a criterion"""
 

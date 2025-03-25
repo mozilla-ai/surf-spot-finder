@@ -8,6 +8,7 @@ from litellm import completion
 from surf_spot_finder.evaluation.evaluators.schemas import EvaluationResult
 from surf_spot_finder.evaluation.test_case import CheckpointCriteria
 
+
 class LLMEvaluator(ABC):
     """Base class for evaluators that use LLM-as-judge"""
 
@@ -92,4 +93,3 @@ class LLMEvaluator(ABC):
             }
         evaluation["points"] = points
         return EvaluationResult.model_validate(evaluation)
-

@@ -16,9 +16,7 @@ class DirectAnswerEvaluator:
 
         # format the answers so that they're dicts with 'id' and 'prediction' keys for hypo
         # and the ref has id and answers keys
-        hypothesis_answer = [
-            {"id": "1", "prediction_text": hypothesis_answer}
-        ]
+        hypothesis_answer = [{"id": "1", "prediction_text": hypothesis_answer}]
         ground_truth_answer = [
             {
                 "id": "1",

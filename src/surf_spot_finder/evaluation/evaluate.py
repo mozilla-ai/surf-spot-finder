@@ -167,9 +167,9 @@ def evaluate(
         logger.info(
             "No telemetry path provided. Running agent to generate telemetry..."
         )
-        assert agent_config_path is not None, (
-            "Agent config path must be provided if running agent"
-        )
+        assert (
+            agent_config_path is not None
+        ), "Agent config path must be provided if running agent"
         telemetry_path = run_agent(test_case, agent_config_path)
     else:
         logger.info(f"Using provided telemetry file: {telemetry_path}")
