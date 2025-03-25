@@ -11,9 +11,10 @@ from surf_spot_finder.config import (
     Config,
 )
 from surf_spot_finder.evaluation.telemetry import TelemetryProcessor
-from surf_spot_finder.evaluation.utils import (
-    verify_checkpoints,
-    verify_hypothesis_answer,
+from surf_spot_finder.evaluation.evaluators import (
+    CheckpointEvaluator,
+    DirectAnswerEvaluator,
+    HypothesisEvaluator,
 )
 from surf_spot_finder.evaluation.test_case import TestCase
 
@@ -55,28 +56,39 @@ def evaluate_telemetry(test_case: TestCase, telemetry_path: str) -> bool:
     # Extract the final answer from the telemetry
     processor = TelemetryProcessor.create(agent_type)
     hypothesis_answer = processor.extract_hypothesis_answer(trace=telemetry)
-    # Verify agent behavior against checkpoints using llm-as-a-judge
-    llm_judge = "openai/gpt-4o"
-    checkpoint_results = verify_checkpoints(
+
+    # Checkpoint evaluation
+    checkpoint_evaluator = CheckpointEvaluator(model=test_case.llm_judge)
+    checkpoint_results = checkpoint_evaluator.evaluate(
         telemetry=telemetry,
         checkpoints=test_case.checkpoints,
-        model=llm_judge,
         processor=processor,
     )
 
-    hypothesis_answer_results = verify_hypothesis_answer(
+    # Hypothesis answer evaluation
+    hypothesis_evaluator = HypothesisEvaluator(model=test_case.llm_judge)
+    hypothesis_answer_results = hypothesis_evaluator.evaluate(
         hypothesis_final_answer=hypothesis_answer,
         ground_truth_answer_dict=test_case.ground_truth,
         ground_truth_checkpoints=test_case.final_answer_criteria,
-        model=llm_judge,
+    )
+
+    # Direct answer evaluation (new)
+    direct_evaluator = DirectAnswerEvaluator()
+    direct_results = direct_evaluator.evaluate(
+        hypothesis_answer=hypothesis_answer,
+        ground_truth_answer=test_case.ground_truth,
+    )
+
+    # Combine all results
+    verification_results = (
+        checkpoint_results + hypothesis_answer_results + direct_results
     )
     # Summarize results
     output_message = ""
     output_message += (
         f"""<yellow>Hypothesis Final answer extracted: {hypothesis_answer}</yellow>\n"""
     )
-
-    verification_results = checkpoint_results + hypothesis_answer_results
     failed_checks = [r for r in verification_results if not r.passed]
     passed_checks = [r for r in verification_results if r.passed]
     missed_points = sum([r.points for r in failed_checks])
@@ -155,9 +167,9 @@ def evaluate(
         logger.info(
             "No telemetry path provided. Running agent to generate telemetry..."
         )
-        assert (
-            agent_config_path is not None
-        ), "Agent config path must be provided if running agent"
+        assert agent_config_path is not None, (
+            "Agent config path must be provided if running agent"
+        )
         telemetry_path = run_agent(test_case, agent_config_path)
     else:
         logger.info(f"Using provided telemetry file: {telemetry_path}")

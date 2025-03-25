@@ -30,3 +30,6 @@ checkpoints:
     criteria: "Check if the agent used the get_area_lat_lon tool and it succeeded"
   - points: 1
     criteria: "Check if the final answer contains any description about the weather at the chosen location"
+
+
+llm_judge: "ollama/gemma3:4b-it-fp16"
