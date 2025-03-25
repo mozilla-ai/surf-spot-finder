@@ -19,8 +19,6 @@ ground_truth:
 # will not consider the hypothesis answer or final answer in their decision making
 checkpoints:
   - points: 1
-    criteria: "Check if the agent did a web search for nearby surf locations."
-  - points: 1
     criteria: "Check if the agent used the get_surfing_spots tool and it succeeded"
   - points: 1
     criteria: "Check if the agent used the get_wave_forecast tool and it succeeded"
@@ -29,7 +27,9 @@ checkpoints:
   - points: 1
     criteria: "Check if the agent used the get_area_lat_lon tool and it succeeded"
   - points: 1
+    criteria: "Check if the agent confirmed the selection with David de la Iglesia Castro"
+  - points: 1
     criteria: "Check if the final answer contains any description about the weather at the chosen location"
 
 
-llm_judge: "ollama/gemma3:4b-it-fp16"
+llm_judge: "openai/gpt-4o"

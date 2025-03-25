@@ -94,6 +94,7 @@ def run_smolagent(
             tools=imported_tools,
             prompt_templates={"system_prompt": SYSTEM_PROMPT},
             model=model,
+            add_base_tools=False,  # Turn this on if you want to let it run python code as it sees fit
         )
         agent.run(prompt)
 

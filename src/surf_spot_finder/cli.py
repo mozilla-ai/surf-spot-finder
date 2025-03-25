@@ -62,7 +62,7 @@ def find_surf_spot(
             model_id=model_id,
             agent_type=agent_type,
             api_key_var=api_key_var,
-            prompt=input_prompt_template,
+            input_prompt_template=input_prompt_template,
             json_tracer=json_tracer,
             api_base=api_base,
             tools=tools,

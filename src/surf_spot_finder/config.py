@@ -1,5 +1,5 @@
 from typing import Annotated, Optional
-from pydantic import AfterValidator, BaseModel, FutureDatetime, PositiveInt
+from pydantic import AfterValidator, BaseModel, ConfigDict, FutureDatetime, PositiveInt
 import yaml
 
 from surf_spot_finder.prompts.shared import INPUT_PROMPT
@@ -20,6 +20,7 @@ def validate_agent_type(value) -> str:
 
 
 class Config(BaseModel):
+    model_config = ConfigDict(extra="forbid")
     input_prompt_template: Annotated[str, AfterValidator(validate_prompt)] = (
         INPUT_PROMPT
     )

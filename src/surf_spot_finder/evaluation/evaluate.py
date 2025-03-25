@@ -42,6 +42,7 @@ def run_agent(test_case: TestCase, agent_config_path: str) -> str:
         json_tracer=config.json_tracer,
         api_base=config.api_base,
         tools=config.tools,
+        input_prompt_template=config.input_prompt_template,
     )
 
 
