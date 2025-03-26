@@ -26,8 +26,6 @@ jobs:
         with:
           python-version: '3.11'
           cache: "pip"
-      - name: Configure pip
-        run: |
       - name: Install
         run: |
           eval `ssh-agent -s`
