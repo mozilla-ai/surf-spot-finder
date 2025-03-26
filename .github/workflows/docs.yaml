@@ -37,7 +37,10 @@ jobs:
           git config user.email 'github-actions[bot]@users.noreply.github.com'
 
       - name: Install requirements
-        run: pip install -e '.[docs]'
+        run: |
+          eval `ssh-agent -s`
+          ssh-add - <<< '${{ secrets.SSF_SSH_TOKEN }}'
+          pip install -e '.[docs]'
 
       - name: Build docs
         if: github.event_name == 'pull_request'
