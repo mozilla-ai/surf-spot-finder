@@ -26,11 +26,13 @@ jobs:
         with:
           python-version: '3.11'
           cache: "pip"
-      - name: Install
+
+      - name: Install  # TODO: Remove when repo becomes public
         run: |
           eval `ssh-agent -s`
           ssh-add - <<< '${{ secrets.SSF_SSH_TOKEN }}'
-          pip install -e '.[arize,langchain,smolagents,openai,tests]'
+          pip install -e '.[tests]'
+
 
       - name: Run tests
         run: pytest -v tests

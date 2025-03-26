@@ -1,11 +1,11 @@
-input:
-  location: Pontevedra
-  date: 2025-03-26 12:00
-  max_driving_hours: 2
-  # input_prompt_template:
-agent:
+location: Pontevedra
+date: 2025-04-02 12:00
+max_driving_hours: 2
+
+framework: openai
+
+main_agent:
   model_id: o3-mini
-  agent_type: openai
   tools:
   - "surf_spot_finder.tools.driving_hours_to_meters"
   - "surf_spot_finder.tools.get_area_lat_lon"

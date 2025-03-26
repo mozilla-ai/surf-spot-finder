@@ -1,17 +1,16 @@
-input:
-  location: Pontevedra
-  date: 2025-03-27 12:00
-  max_driving_hours: 2
-  # input_prompt_template:
-agent:
+location: Pontevedra
+date: 2025-04-02 12:00
+max_driving_hours: 2
+
+framework: langchain
+
+main_agent:
   model_id: o3-mini
-  # model_id: ollama/llama3.2:3b
-  agent_type: langchain
   tools:
   - "surf_spot_finder.tools.driving_hours_to_meters"
   - "surf_spot_finder.tools.get_area_lat_lon"
   - "surf_spot_finder.tools.get_surfing_spots"
   - "surf_spot_finder.tools.get_wave_forecast"
   - "surf_spot_finder.tools.get_wind_forecast"
-  - "surf_spot_finder.tools.search_web"
-  - "surf_spot_finder.tools.visit_webpage"
+  - "any_agent.tools.search_web"
+  - "any_agent.tools.visit_webpage"
