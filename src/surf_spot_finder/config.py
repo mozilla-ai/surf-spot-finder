@@ -1,6 +1,7 @@
-from typing import Annotated, Optional
+from typing import Annotated
+
+from any_agent.schema import AgentSchema
 from pydantic import AfterValidator, BaseModel, FutureDatetime, PositiveInt
-import yaml
 
 from surf_spot_finder.prompts.shared import INPUT_PROMPT
 
@@ -12,50 +13,15 @@ def validate_prompt(value) -> str:
     return value
 
 
-def validate_agent_type(value) -> str:
-    from surf_spot_finder.agents import validate_agent_type
-
-    validate_agent_type(value)
-    return value
-
-
 class Config(BaseModel):
-    input_prompt_template: Annotated[str, AfterValidator(validate_prompt)] = (
-        INPUT_PROMPT
-    )
     location: str
     max_driving_hours: PositiveInt
     date: FutureDatetime
-    model_id: str
-    agent_type: Annotated[str, AfterValidator(validate_agent_type)]
-    api_key_var: Optional[str] = None
-    json_tracer: bool = True
-    api_base: Optional[str] = None
-    tools: Optional[list[str]] = None
+    input_prompt_template: Annotated[str, AfterValidator(validate_prompt)] = (
+        INPUT_PROMPT
+    )
 
-    @classmethod
-    def from_yaml(cls, yaml_path: str) -> "Config":
-        """
-        Create a Config instance from a YAML file.
+    framework: str
 
-        Args:
-            yaml_path: Path to the YAML configuration file
-
-        Returns:
-            Config: A new Config instance populated with values from the YAML file
-        """
-        with open(yaml_path, "r") as f:
-            data = yaml.safe_load(f)
-
-        # Extract and flatten the nested structure
-        config_dict = {}
-
-        # Add input parameters
-        if "input" in data:
-            config_dict.update(data["input"])
-
-        # Add agent parameters
-        if "agent" in data:
-            config_dict.update(data["agent"])
-        # Create instance from the flattened dictionary
-        return cls(**config_dict)
+    main_agent: AgentSchema
+    managed_agents: list[AgentSchema] | None = None
