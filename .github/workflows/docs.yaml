@@ -36,6 +36,11 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
 
+      - name: Setup SSH  # TODO: Remove when repo becomes public
+        run: |
+          eval `ssh-agent -s`
+          ssh-add - <<< '${{ secrets.SSF_SSH_TOKEN }}'
+
       - name: Install requirements
         run: pip install -e '.[docs]'
 
