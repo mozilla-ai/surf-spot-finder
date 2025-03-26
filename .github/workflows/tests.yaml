@@ -26,7 +26,10 @@ jobs:
         with:
           python-version: '3.11'
           cache: "pip"
-
+      - name: Configure pip
+        run: |
+          # https://github.com/orgs/python-poetry/discussions/3794
+          git config --global url."https://${{ secrets.GH_TOKEN }}@github.com/".insteadOf "https://github.com/"
       - name: Install
         run: pip install -e '.[arize,langchain,smolagents,openai,tests]'
 
