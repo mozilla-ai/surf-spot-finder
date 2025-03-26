@@ -30,7 +30,6 @@ class QuestionAnsweringSquadEvaluator:
         result = self.metric.compute(
             predictions=hypothesis_answer, references=ground_truth_answer
         )
-        print(result)
 
         match = EvaluationResult(
             passed=True if int(result["exact_match"]) == 1 else False,
