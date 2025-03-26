@@ -17,4 +17,4 @@ agent:
   - "surf_spot_finder.tools.get_surfing_spots"
   - "surf_spot_finder.tools.get_wave_forecast"
   - "surf_spot_finder.tools.get_wind_forecast"
-  - "surf_spot_finder.tools.send_slack_message"
+  - "any_agent.tools.send_slack_message"
