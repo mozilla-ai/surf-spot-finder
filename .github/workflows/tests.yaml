@@ -27,13 +27,11 @@ jobs:
           python-version: '3.11'
           cache: "pip"
 
-      - name: Setup SSH  # TODO: Remove when repo becomes public
+      - name: Install  # TODO: Remove when repo becomes public
         run: |
           eval `ssh-agent -s`
           ssh-add - <<< '${{ secrets.SSF_SSH_TOKEN }}'
-
-      - name: Install
-        run: pip install -e '.[tests]'
+          pip install -e '.[tests]'
 
 
       - name: Run tests
