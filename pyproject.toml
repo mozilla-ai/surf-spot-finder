@@ -6,13 +6,12 @@ build-backend = "setuptools.build_meta"
 name = "surf-spot-finder"
 readme = "README.md"
 license = {text = "Apache-2.0"}
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 dynamic = ["version"]
 dependencies = [
+  "any-agent  @ git+ssh://git@github.com/mozilla-ai/any-agent",
   "fire",
   "loguru",
-  "opentelemetry-exporter-otlp",
-  "opentelemetry-sdk",
   "pydantic",
 ]
 
