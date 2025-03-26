@@ -18,7 +18,7 @@ def find_surf_spot(
     """Find the best surf spot based on the given criteria.
 
     Args:
-        from_config: Path to a YAML config file.
+        config_file: Path to a YAML config file.
             See [Config][surf_spot_finder.config.Config]
 
     """
