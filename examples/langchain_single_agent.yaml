@@ -1,11 +1,8 @@
-input:
-  location: Pontevedra
-  date: 2025-03-27 12:00
-  max_driving_hours: 2
-  # input_prompt_template:
-agent:
+location: Pontevedra
+date: 2025-04-02 12:00
+max_driving_hours: 2
+
+framework: langchain
+
+main_agent:
   model_id: o3-mini
-  agent_type: langchain
-  tools:
-  - "surf_spot_finder.tools.search_web"
-  - "surf_spot_finder.tools.visit_webpage"

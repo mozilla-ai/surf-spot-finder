@@ -3,7 +3,12 @@ from typing import Annotated
 from any_agent.schema import AgentSchema
 from pydantic import AfterValidator, BaseModel, FutureDatetime, PositiveInt
 
-from surf_spot_finder.prompts.shared import INPUT_PROMPT
+
+INPUT_PROMPT_TEMPLATE = """
+According to the forecast, what will be the best spot to surf around {LOCATION},
+in a {MAX_DRIVING_HOURS} hour driving radius,
+at {DATE}?"
+""".strip()
 
 
 def validate_prompt(value) -> str:
@@ -18,7 +23,7 @@ class Config(BaseModel):
     max_driving_hours: PositiveInt
     date: FutureDatetime
     input_prompt_template: Annotated[str, AfterValidator(validate_prompt)] = (
-        INPUT_PROMPT
+        INPUT_PROMPT_TEMPLATE
     )
 
     framework: str

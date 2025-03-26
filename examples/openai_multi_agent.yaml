@@ -1,8 +1,38 @@
-input:
-  location: Pontevedra
-  date: 2025-03-27 12:00
-  max_driving_hours: 2
-agent:
+location: Pontevedra
+date: 2025-04-02 12:00
+max_driving_hours: 2
+
+framework: openai
+
+main_agent:
+  name: main_agent
   model_id: o3-mini
-  agent_type: openai_multi_agent
-# input_prompt_template:
+  instructions: >
+    # System context\n
+    You are part of a multi-agent system called the Agents SDK, designed to make agent coordination and execution easy.
+    Agents uses two primary abstraction: **Agents** and **Handoffs**.
+    An agent encompasses instructions and tools and can hand off a conversation to another agent when appropriate.
+    Handoffs are achieved by calling a handoff function, generally named `transfer_to_<agent_name>`.
+    Transfers between agents are handled seamlessly in the background; do not mention or draw attention to these transfers in your conversation with the user.\n
+
+managed_agents:
+
+  - name: user-verifiaction-agent
+    model_id: gpt-4o-mini
+    instructions: Ask users to verify a step, plan or answer.
+    tools:
+      - any_agent.tools.ask_user_verification
+
+  - name: general-web-search-agent
+    model_id: gpt-4o-mini
+    instructions: Search the web and visit webpages to find answers.
+    tools:
+      - any_agent.tools.search_web
+      - any_agent.tools.visit_webpage
+
+  - name: user-communication-agent
+    model_id: gpt-4o-mini
+    instructions: Communicates to the user
+    handoff: True
+    tools:
+      - any_agent.tools.show_final_answer
