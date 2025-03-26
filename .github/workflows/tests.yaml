@@ -30,7 +30,8 @@ jobs:
         run: |
       - name: Install
         run: |
-          git config --global url."https://${{ secrets.GH_TOKEN }}@github.com/".insteadOf "https://github.com/"
+          eval `ssh-agent -s`
+          ssh-add - <<< '${{ secrets.SSF_SSH_TOKEN }}'
           pip install -e '.[arize,langchain,smolagents,openai,tests]'
 
       - name: Run tests
