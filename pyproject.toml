@@ -55,5 +55,3 @@ dev = [
 [project.scripts]
 surf-spot-finder = "surf_spot_finder.cli:main"
 surf-spot-finder-evaluate = "surf_spot_finder.evaluation.evaluate:main"
-# TODO maybe this would be lumigator
-start-phoenix = "phoenix.server.main:main"

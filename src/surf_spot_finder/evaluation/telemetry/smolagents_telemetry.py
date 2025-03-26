@@ -1,7 +1,7 @@
 from typing import Any, Dict, List
 import json
 
-from surf_spot_finder.agents import AgentType
+from surf_spot_finder.evaluation import AgentType
 from surf_spot_finder.evaluation.telemetry import TelemetryProcessor
 
 

@@ -168,4 +168,3 @@ cython_debug/
 .vscode/
 
 output
-telemetry_output

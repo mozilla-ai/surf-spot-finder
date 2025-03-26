@@ -6,7 +6,6 @@ from typing import Any, Dict, List, Optional
 from loguru import logger
 from fire import Fire
 import pandas as pd
-from surf_spot_finder.cli import find_surf_spot
 from surf_spot_finder.config import (
     Config,
 )
@@ -17,13 +16,15 @@ from surf_spot_finder.evaluation.evaluators import (
     HypothesisEvaluator,
 )
 from surf_spot_finder.evaluation.test_case import TestCase
+from any_agent import load_agent, run_agent
+from any_agent.tracing import get_tracer_provider, setup_tracing
 
 logger.remove()
 logger = logger.opt(ansi=True)
 logger.add(sys.stdout, colorize=True, format="{message}")
 
 
-def run_agent(test_case: TestCase, agent_config_path: str) -> str:
+def run(test_case: TestCase, agent_config_path: str) -> str:
     input_data = test_case.input
 
     logger.info("Loading config")
@@ -31,19 +32,29 @@ def run_agent(test_case: TestCase, agent_config_path: str) -> str:
     config.location = input_data.location
     config.date = input_data.date
     config.max_driving_hours = input_data.max_driving_hours
-    config.json_tracer = input_data.json_tracer
-    return find_surf_spot(
-        location=config.location,
-        date=config.date,
-        max_driving_hours=config.max_driving_hours,
-        agent_type=config.agent_type,
-        model_id=config.model_id,
-        api_key_var=config.api_key_var,
-        json_tracer=config.json_tracer,
-        api_base=config.api_base,
-        tools=config.tools,
-        input_prompt_template=config.input_prompt_template,
+    logger.info("Setting up tracing")
+    tracer_provider, tracing_path = get_tracer_provider(project_name="surf-spot-finder")
+    setup_tracing(tracer_provider, config.framework)
+
+    logger.info(f"Loading {config.framework} agent")
+    logger.info(f"{config.managed_agents}")
+    agent = load_agent(
+        framework=config.framework,
+        main_agent=config.main_agent,
+        managed_agents=config.managed_agents,
     )
+
+    query = config.input_prompt_template.format(
+        LOCATION=config.location,
+        MAX_DRIVING_HOURS=config.max_driving_hours,
+        DATE=config.date,
+    )
+    logger.info(f"Running agent with query:\n{query}")
+    run_agent(agent, query)
+
+    logger.success("Done!")
+
+    return tracing_path
 
 
 def evaluate_telemetry(test_case: TestCase, telemetry_path: str) -> bool:
@@ -75,12 +86,14 @@ def evaluate_telemetry(test_case: TestCase, telemetry_path: str) -> bool:
     )
 
     # Direct answer evaluation (new)
-    direct_evaluator = QuestionAnsweringSquadEvaluator()
-    direct_results = direct_evaluator.evaluate(
-        hypothesis_answer=hypothesis_answer,
-        ground_truth_answer=test_case.ground_truth,
-    )
-
+    if test_case.ground_truth:
+        direct_evaluator = QuestionAnsweringSquadEvaluator()
+        direct_results = direct_evaluator.evaluate(
+            hypothesis_answer=hypothesis_answer,
+            ground_truth_answer=test_case.ground_truth,
+        )
+    else:
+        direct_results = []
     # Combine all results
     verification_results = (
         checkpoint_results + hypothesis_answer_results + direct_results
@@ -171,7 +184,7 @@ def evaluate(
         assert (
             agent_config_path is not None
         ), "Agent config path must be provided if running agent"
-        telemetry_path = run_agent(test_case, agent_config_path)
+        telemetry_path = run(test_case, agent_config_path)
     else:
         logger.info(f"Using provided telemetry file: {telemetry_path}")
         logger.info(

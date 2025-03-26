@@ -2,6 +2,7 @@ from typing import Annotated
 
 from any_agent.schema import AgentSchema
 from pydantic import AfterValidator, BaseModel, ConfigDict, FutureDatetime, PositiveInt
+import yaml
 
 
 INPUT_PROMPT_TEMPLATE = """
@@ -32,3 +33,17 @@ class Config(BaseModel):
 
     main_agent: AgentSchema
     managed_agents: list[AgentSchema] | None = None
+
+    @classmethod
+    def from_yaml(cls, yaml_path: str) -> "Config":
+        """
+        with open(yaml_path, "r") as f:
+            data = yaml.safe_load(f)
+        return cls(**data)    yaml_path: Path to the YAML configuration file
+
+        Returns:
+            Config: A new Config instance populated with values from the YAML file
+        """
+        with open(yaml_path, "r") as f:
+            data = yaml.safe_load(f)
+        return cls(**data)

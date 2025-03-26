@@ -3,7 +3,8 @@ import json
 import re
 from abc import ABC, abstractmethod
 from loguru import logger
-from surf_spot_finder.agents import AgentType
+
+from surf_spot_finder.evaluation import AgentType
 
 
 class TelemetryProcessor(ABC):

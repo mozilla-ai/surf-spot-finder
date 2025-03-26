@@ -11,7 +11,6 @@ class InputModel(BaseModel):
     location: str
     date: str
     max_driving_hours: int
-    json_tracer: bool
 
 
 class CheckpointCriteria(BaseModel):
@@ -53,12 +52,15 @@ class TestCase(BaseModel):
                         }
                     )
 
-        add_gt_final_answer_criteria(test_case_dict["ground_truth"])
-        test_case_dict["final_answer_criteria"] = final_answer_criteria
-        # remove the points from the ground_truth list but keep the name and value
-        test_case_dict["ground_truth"] = [
-            item for item in test_case_dict["ground_truth"] if isinstance(item, dict)
-        ]
+        if "ground_truth" in test_case_dict:
+            add_gt_final_answer_criteria(test_case_dict["ground_truth"])
+            test_case_dict["final_answer_criteria"] = final_answer_criteria
+            # remove the points from the ground_truth list but keep the name and value
+            test_case_dict["ground_truth"] = [
+                item
+                for item in test_case_dict["ground_truth"]
+                if isinstance(item, dict)
+            ]
 
         test_case_dict["test_case_path"] = test_case_path
         # verify that the llm_judge is a valid litellm model

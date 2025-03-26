@@ -1,13 +1,16 @@
-input:
-  location: Pontevedra
-  date: 2025-03-27 12:00
-  max_driving_hours: 2
-  input_prompt_template: |
-    According to the forecast, what will be the best spot to surf around {LOCATION},
-    in a {MAX_DRIVING_HOURS} hour driving radius, at {DATE}?
-    Find a few options and then discuss it with David de la Iglesia Castro. You should recommend him some choices,
-    and then confirm the final selection with him.
-agent:
+
+location: Pontevedra
+date: 2025-03-27 12:00
+max_driving_hours: 2
+input_prompt_template: |
+  According to the forecast, what will be the best spot to surf around {LOCATION},
+  in a {MAX_DRIVING_HOURS} hour driving radius, at {DATE}?
+  Find a few options and then discuss it with David de la Iglesia Castro. You should recommend him some choices,
+  and then confirm the final selection with him.
+
+framework: smolagents
+
+main_agent:
   model_id: openai/gpt-4o
   # model_id: ollama/llama3.1:latest
   api_key_var: OPENAI_API_KEY
@@ -18,5 +21,5 @@ agent:
   - "surf_spot_finder.tools.get_surfing_spots"
   - "surf_spot_finder.tools.get_wave_forecast"
   - "surf_spot_finder.tools.get_wind_forecast"
-  - "any_agent.tools.send_slack_message"
+  - "any_agent.tools.send_console_message"
   - "smolagents.FinalAnswerTool"
