@@ -28,10 +28,11 @@ jobs:
           cache: "pip"
       - name: Configure pip
         run: |
+      - name: Install
+        run: |
           eval `ssh-agent -s`
           ssh-add - <<< '${{ secrets.SSF_SSH_TOKEN }}'
-      - name: Install
-        run: pip install -e '.[arize,langchain,smolagents,openai,tests]'
+          pip install -e '.[arize,langchain,smolagents,openai,tests]'
 
       - name: Run tests
         run: pytest -v tests
