@@ -26,9 +26,11 @@ jobs:
         with:
           python-version: '3.11'
           cache: "pip"
-
       - name: Install
-        run: pip install -e '.[arize,langchain,smolagents,openai,tests]'
+        run: |
+          eval `ssh-agent -s`
+          ssh-add - <<< '${{ secrets.SSF_SSH_TOKEN }}'
+          pip install -e '.[arize,langchain,smolagents,openai,tests]'
 
       - name: Run tests
         run: pytest -v tests
