@@ -2,7 +2,7 @@ from typing import Any, Dict, List
 import json
 
 from any_agent import AgentFramework
-
+from loguru import logger
 from surf_spot_finder.evaluation.telemetry import TelemetryProcessor
 
 
@@ -24,8 +24,8 @@ class OpenAITelemetryProcessor(TelemetryProcessor):
                 )
                 if output_key in span["attributes"]:
                     return span["attributes"][output_key]
-
-        raise ValueError("No agent final answer found in trace")
+        logger.warning("No agent final answer found in trace")
+        return "NO FINAL ANSWER FOUND"
 
     def _extract_telemetry_data(self, telemetry: List[Dict[str, Any]]) -> list:
         """Extract LLM calls and tool calls from OpenAI telemetry."""

@@ -1,5 +1,5 @@
 location: Pontevedra
-date: 2025-03-27 12:00
+date: 2025-04-05 12:00
 max_driving_hours: 2
 input_prompt_template: |
   According to the forecast, what will be the best spot to surf around {LOCATION},
