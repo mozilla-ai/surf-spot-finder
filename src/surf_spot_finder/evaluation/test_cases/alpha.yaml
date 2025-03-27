@@ -6,13 +6,12 @@ input:
   location: "Vigo"
   date: "2025-03-27 22:00"
   max_driving_hours: 3
-  json_tracer: true
 
 
-ground_truth:
-  - name: "Surf location"
-    points: 5
-    value: "Playa de Samil"
+# ground_truth:
+#   - name: "Surf location"
+#     points: 5
+#     value: "Playa de Samil"
 
 # Base checkpoints for agent behavior
 # These evaluators for these checkpoints

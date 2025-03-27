@@ -14,7 +14,6 @@ main_agent:
   model_id: gpt-4o
   # model_id: ollama/llama3.1:latest
   api_key_var: OPENAI_API_KEY
-  agent_type: langchain
   tools:
   - "surf_spot_finder.tools.driving_hours_to_meters"
   - "surf_spot_finder.tools.get_area_lat_lon"

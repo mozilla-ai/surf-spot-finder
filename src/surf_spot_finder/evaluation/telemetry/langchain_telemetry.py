@@ -1,16 +1,17 @@
 from typing import Any, Dict, List
 import json
+from any_agent import AgentFramework
 from langchain_core.messages import BaseMessage
 
-from surf_spot_finder.evaluation import AgentType
+
 from surf_spot_finder.evaluation.telemetry import TelemetryProcessor
 
 
 class LangchainTelemetryProcessor(TelemetryProcessor):
     """Processor for Langchain agent telemetry data."""
 
-    def _get_agent_type(self) -> AgentType:
-        return AgentType.LANGCHAIN
+    def _get_agent_framework(self) -> AgentFramework:
+        return AgentFramework.LANGCHAIN
 
     def extract_hypothesis_answer(self, trace: List[Dict[str, Any]]) -> str:
         for span in reversed(trace):

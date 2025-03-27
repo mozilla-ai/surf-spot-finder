@@ -2,9 +2,8 @@ from typing import Any, Dict, List, ClassVar
 import json
 import re
 from abc import ABC, abstractmethod
+from any_agent import AgentFramework
 from loguru import logger
-
-from surf_spot_finder.evaluation import AgentType
 
 
 class TelemetryProcessor(ABC):
@@ -13,31 +12,31 @@ class TelemetryProcessor(ABC):
     MAX_EVIDENCE_LENGTH: ClassVar[int] = 400
 
     @classmethod
-    def create(cls, agent_type: AgentType) -> "TelemetryProcessor":
+    def create(cls, agent_framework: AgentFramework) -> "TelemetryProcessor":
         """Factory method to create the appropriate telemetry processor."""
-        if agent_type == AgentType.LANGCHAIN:
+        if agent_framework == AgentFramework.LANGCHAIN:
             from surf_spot_finder.evaluation.telemetry.langchain_telemetry import (
                 LangchainTelemetryProcessor,
             )
 
             return LangchainTelemetryProcessor()
-        elif agent_type == AgentType.SMOLAGENTS:
+        elif agent_framework == AgentFramework.SMOLAGENTS:
             from surf_spot_finder.evaluation.telemetry.smolagents_telemetry import (
                 SmolagentsTelemetryProcessor,
             )
 
             return SmolagentsTelemetryProcessor()
-        elif agent_type == AgentType.OPENAI:
+        elif agent_framework == AgentFramework.OPENAI:
             from surf_spot_finder.evaluation.telemetry.openai_telemetry import (
                 OpenAITelemetryProcessor,
             )
 
             return OpenAITelemetryProcessor()
         else:
-            raise ValueError(f"Unsupported agent type {agent_type}")
+            raise ValueError(f"Unsupported agent type {agent_framework}")
 
     @staticmethod
-    def determine_agent_type(trace: List[Dict[str, Any]]) -> AgentType:
+    def determine_agent_framework(trace: List[Dict[str, Any]]) -> AgentFramework:
         """Determine the agent type based on the trace.
         These are not really stable ways to find it, because we're waiting on some
         reliable method for determining the agent type. This is a temporary solution.
@@ -45,15 +44,15 @@ class TelemetryProcessor(ABC):
         for span in trace:
             if "langchain" in span.get("attributes", {}).get("input.value", ""):
                 logger.info("Agent type is LANGCHAIN")
-                return AgentType.LANGCHAIN
+                return AgentFramework.LANGCHAIN
             if span.get("attributes", {}).get("smolagents.max_steps"):
                 logger.info("Agent type is SMOLAGENTS")
-                return AgentType.SMOLAGENTS
+                return AgentFramework.SMOLAGENTS
             # This is extremely fragile but there currently isn't
             # any specific key to indicate the agent type
             if span.get("name") == "response":
                 logger.info("Agent type is OPENAI")
-                return AgentType.OPENAI
+                return AgentFramework.OPENAI
         raise ValueError(
             "Could not determine agent type from trace, or agent type not supported"
         )
@@ -75,7 +74,7 @@ class TelemetryProcessor(ABC):
 
     def _format_evidence(self, calls: List[Dict]) -> str:
         """Format extracted data into a standardized output format."""
-        evidence = f"## {self._get_agent_type().name} Agent Execution\n\n"
+        evidence = f"## {self._get_agent_framework().name} Agent Execution\n\n"
 
         for idx, call in enumerate(calls, start=1):
             evidence += f"### Call {idx}\n"
@@ -96,7 +95,7 @@ class TelemetryProcessor(ABC):
         return evidence
 
     @abstractmethod
-    def _get_agent_type(self) -> AgentType:
+    def _get_agent_framework(self) -> AgentFramework:
         """Get the agent type associated with this processor."""
         pass
 

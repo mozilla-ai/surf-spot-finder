@@ -1,15 +1,16 @@
 from typing import Any, Dict, List
 import json
 
-from surf_spot_finder.evaluation import AgentType
+from any_agent import AgentFramework
+
 from surf_spot_finder.evaluation.telemetry import TelemetryProcessor
 
 
 class SmolagentsTelemetryProcessor(TelemetryProcessor):
     """Processor for SmoL Agents telemetry data."""
 
-    def _get_agent_type(self) -> AgentType:
-        return AgentType.SMOLAGENTS
+    def _get_agent_framework(self) -> AgentFramework:
+        return AgentFramework.SMOLAGENTS
 
     def extract_hypothesis_answer(self, trace: List[Dict[str, Any]]) -> str:
         for span in reversed(trace):

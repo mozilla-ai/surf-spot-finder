@@ -1,5 +1,6 @@
 from typing import Annotated
 
+from any_agent import AgentFramework
 from any_agent.schema import AgentSchema
 from pydantic import AfterValidator, BaseModel, ConfigDict, FutureDatetime, PositiveInt
 import yaml
@@ -29,7 +30,7 @@ class Config(BaseModel):
         INPUT_PROMPT_TEMPLATE
     )
 
-    framework: str
+    framework: AgentFramework
 
     main_agent: AgentSchema
     managed_agents: list[AgentSchema] | None = None

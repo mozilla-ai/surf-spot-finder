@@ -63,10 +63,10 @@ def evaluate_telemetry(test_case: TestCase, telemetry_path: str) -> bool:
         telemetry: List[Dict[str, Any]] = json.loads(f.read())
     logger.info(f"Telemetry loaded from {telemetry_path}")
 
-    agent_type = TelemetryProcessor.determine_agent_type(telemetry)
+    agent_framework = TelemetryProcessor.determine_agent_framework(telemetry)
 
     # Extract the final answer from the telemetry
-    processor = TelemetryProcessor.create(agent_type)
+    processor = TelemetryProcessor.create(agent_framework)
     hypothesis_answer = processor.extract_hypothesis_answer(trace=telemetry)
 
     # Checkpoint evaluation

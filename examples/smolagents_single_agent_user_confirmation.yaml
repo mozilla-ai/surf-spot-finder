@@ -1,4 +1,3 @@
-
 location: Pontevedra
 date: 2025-03-27 12:00
 max_driving_hours: 2
@@ -7,6 +6,8 @@ input_prompt_template: |
   in a {MAX_DRIVING_HOURS} hour driving radius, at {DATE}?
   Find a few options and then discuss it with David de la Iglesia Castro. You should recommend him some choices,
   and then confirm the final selection with him.
+  Once he gives the final selection, save a detailed description of the weather at the chosen location into a file
+  named "final_answer.txt". Also save a file called "history.txt" which has a list of your thought process in the choice.
 
 framework: smolagents
 
@@ -14,7 +15,6 @@ main_agent:
   model_id: openai/gpt-4o
   # model_id: ollama/llama3.1:latest
   api_key_var: OPENAI_API_KEY
-  agent_type: smolagents
   tools:
   - "surf_spot_finder.tools.driving_hours_to_meters"
   - "surf_spot_finder.tools.get_area_lat_lon"
@@ -23,3 +23,17 @@ main_agent:
   - "surf_spot_finder.tools.get_wind_forecast"
   - "any_agent.tools.send_console_message"
   - "smolagents.FinalAnswerTool"
+  - command: "docker"
+    args:
+      - "run"
+      - "-i"
+      - "--rm"
+      - "--mount"
+      - "type=bind,src=/tmp/surf-spot-finder,dst=/projects"
+      - "mcp/filesystem"
+      - "/projects"
+    tools:
+      - "read_file"
+      - "write_file"
+      - "directory_tree"
+      - "list_allowed_directories"

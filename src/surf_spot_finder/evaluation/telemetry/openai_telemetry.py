@@ -1,15 +1,16 @@
 from typing import Any, Dict, List
 import json
 
-from surf_spot_finder.evaluation import AgentType
+from any_agent import AgentFramework
+
 from surf_spot_finder.evaluation.telemetry import TelemetryProcessor
 
 
 class OpenAITelemetryProcessor(TelemetryProcessor):
     """Processor for OpenAI agent telemetry data."""
 
-    def _get_agent_type(self) -> AgentType:
-        return AgentType.OPENAI
+    def _get_agent_framework(self) -> AgentFramework:
+        return AgentFramework.OPENAI
 
     def extract_hypothesis_answer(self, trace: List[Dict[str, Any]]) -> str:
         for span in reversed(trace):
@@ -82,10 +83,10 @@ class OpenAITelemetryProcessor(TelemetryProcessor):
 
 # Backward compatibility functions that use the new class structure
 def extract_hypothesis_answer(
-    trace: List[Dict[str, Any]], agent_type: AgentType
+    trace: List[Dict[str, Any]], agent_framework: AgentFramework
 ) -> str:
     """Extract the hypothesis agent final answer from the trace"""
-    processor = TelemetryProcessor.create(agent_type)
+    processor = TelemetryProcessor.create(agent_framework)
     return processor.extract_hypothesis_answer(trace)
 
 
@@ -97,7 +98,9 @@ def parse_generic_key_value_string(text: str) -> Dict[str, str]:
     return TelemetryProcessor.parse_generic_key_value_string(text)
 
 
-def extract_evidence(telemetry: List[Dict[str, Any]], agent_type: AgentType) -> str:
+def extract_evidence(
+    telemetry: List[Dict[str, Any]], agent_framework: AgentFramework
+) -> str:
     """Extract relevant telemetry evidence based on the agent type."""
-    processor = TelemetryProcessor.create(agent_type)
+    processor = TelemetryProcessor.create(agent_framework)
     return processor.extract_evidence(telemetry)
