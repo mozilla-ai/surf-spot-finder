@@ -4,6 +4,8 @@
 
 ::: surf_spot_finder.config.Config
 
+::: surf_spot_finder.no_framework
+
 ## Tools
 
 ::: surf_spot_finder.tools.openmeteo

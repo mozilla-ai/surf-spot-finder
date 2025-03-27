@@ -24,7 +24,33 @@ class SpotScore(BaseModel):
 
 
 @logger.catch(reraise=True)
-def find_surf_spot_no_framework(location: str, max_driving_hours: int, date: datetime):
+def find_surf_spot_no_framework(
+    location: str, max_driving_hours: int, date: datetime, model_id: str
+) -> list[SpotScore]:
+    """Find the best surf spot based on the given `location` and `date`.
+
+    Uses the following tools:
+
+    - any_agent.tools.web_browsing
+    - [surf_spot_finder.tools.openmeteo][]
+    - [surf_spot_finder.tools.openstreetmap][]
+
+    To find nearby spots along with the forecast and
+    recommended conditions for the spot.
+
+    Then, uses `litellm` with the provided `model_id` to score
+    each spot based on the available information.
+
+    Args:
+        location: The place of interest.
+        max_driving_hours: Used to limit the surf spots based on
+            the distance to `location`.
+        date: Used to filter the forecast results.
+        model_id: Can be any of the [litellm providers](https://docs.litellm.ai/docs/providers).
+
+    Returns:
+        A list of spot scores and reasons for the value.
+    """
     max_driving_meters = driving_hours_to_meters(max_driving_hours)
     lat, lon = get_area_lat_lon(location)
 
