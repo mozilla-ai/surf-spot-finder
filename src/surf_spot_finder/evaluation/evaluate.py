@@ -33,7 +33,9 @@ def run(test_case: TestCase, agent_config_path: str) -> str:
     config.date = input_data.date
     config.max_driving_hours = input_data.max_driving_hours
     logger.info("Setting up tracing")
-    tracer_provider, tracing_path = get_tracer_provider(project_name="surf-spot-finder", agent_framework=config.framework)
+    tracer_provider, tracing_path = get_tracer_provider(
+        project_name="surf-spot-finder", agent_framework=config.framework
+    )
     setup_tracing(tracer_provider, config.framework)
 
     logger.info(f"Loading {config.framework} agent")

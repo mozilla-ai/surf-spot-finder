@@ -26,7 +26,9 @@ def find_surf_spot(
     config = Config.model_validate(yaml.safe_load(Path(config_file).read_text()))
 
     logger.info("Setting up tracing")
-    tracer_provider, tracing_path = get_tracer_provider(project_name="surf-spot-finder", agent_framework=config.framework)
+    tracer_provider, tracing_path = get_tracer_provider(
+        project_name="surf-spot-finder", agent_framework=config.framework
+    )
     setup_tracing(tracer_provider, config.framework)
 
     logger.info(f"Loading {config.framework} agent")
