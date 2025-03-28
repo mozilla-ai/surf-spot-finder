@@ -55,4 +55,4 @@ namespaces = false
 [project.scripts]
 surf-spot-finder = "surf_spot_finder.cli:main"
 surf-spot-finder-no-framework = "surf_spot_finder.no_framework:main"
-surf-spot-finder-evaluate = "surf_spot_finder.evaluation.evaluate:main"
+surf-spot-finder-evaluate = "surf_spot_finder.evaluation.main:main"

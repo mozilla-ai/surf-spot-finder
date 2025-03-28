@@ -11,6 +11,7 @@ class InputModel(BaseModel):
     location: str
     date: str
     max_driving_hours: int
+    input_prompt_template: str
 
 
 class CheckpointCriteria(BaseModel):

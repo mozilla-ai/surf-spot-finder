@@ -28,9 +28,14 @@ def run(test_case: TestCase, agent_config_path: str) -> str:
 
     logger.info("Loading config")
     config = Config.from_yaml(agent_config_path)
+    # pretty print
+    logger.info(
+        f"Overriding config with test case input:\n{json.dumps(input_data.model_dump(), indent=2)}"
+    )
     config.location = input_data.location
     config.date = input_data.date
     config.max_driving_hours = input_data.max_driving_hours
+    config.input_prompt_template = input_data.input_prompt_template
     logger.info("Setting up tracing")
     tracer_provider, tracing_path = get_tracer_provider(
         project_name="surf-spot-finder", agent_framework=config.framework
@@ -54,6 +59,9 @@ def run(test_case: TestCase, agent_config_path: str) -> str:
     agent.run(query)
 
     logger.success("Done!")
+
+    # delete the agent to shut down the resources it manages
+    del agent
 
     return tracing_path
 
