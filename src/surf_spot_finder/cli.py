@@ -1,3 +1,4 @@
+from any_agent import AnyAgent
 import yaml
 from pathlib import Path
 
@@ -7,7 +8,6 @@ from loguru import logger
 from surf_spot_finder.config import (
     Config,
 )
-from any_agent import load_agent, run_agent
 from any_agent.tracing import get_tracer_provider, setup_tracing
 
 
@@ -33,9 +33,9 @@ def find_surf_spot(
 
     logger.info(f"Loading {config.framework} agent")
     logger.info(f"{config.managed_agents}")
-    agent = load_agent(
-        framework=config.framework,
-        main_agent=config.main_agent,
+    agent = AnyAgent.create(
+        agent_framework=config.framework,
+        agent_config=config.main_agent,
         managed_agents=config.managed_agents,
     )
 
@@ -45,7 +45,7 @@ def find_surf_spot(
         DATE=config.date,
     )
     logger.info(f"Running agent with query:\n{query}")
-    run_agent(agent, query)
+    agent.run(query)
 
     logger.success("Done!")
 
