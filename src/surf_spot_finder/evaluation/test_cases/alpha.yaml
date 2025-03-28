@@ -10,7 +10,7 @@ input:
     Please help find the best place to surf around {LOCATION},
     in a {MAX_DRIVING_HOURS} hour driving radius, at {DATE}?
     Find a few options and then message David de la Iglesia Castro to discuss it with him.
-    Make sure he agrees with the choice. Your final answer should be a detail description of the surf location, wind, wave, and weather conditions.
+    Make sure he agrees with the choice. Your final answer should be a detailed description of the surf location, wind, wave, and weather conditions.
     In addition to making it your final answer, also include description of the weather at the chosen location by writing to the file /projects/final_answer.txt
 
 # Optionally I can check whether it picked the right response
