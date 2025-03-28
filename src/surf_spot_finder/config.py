@@ -1,7 +1,7 @@
 from typing import Annotated
 
 from any_agent import AgentFramework
-from any_agent.schema import AgentSchema
+from any_agent.config import AgentConfig
 from pydantic import AfterValidator, BaseModel, ConfigDict, FutureDatetime, PositiveInt
 import yaml
 
@@ -32,8 +32,8 @@ class Config(BaseModel):
 
     framework: AgentFramework
 
-    main_agent: AgentSchema
-    managed_agents: list[AgentSchema] | None = None
+    main_agent: AgentConfig
+    managed_agents: list[AgentConfig] | None = None
 
     @classmethod
     def from_yaml(cls, yaml_path: str) -> "Config":

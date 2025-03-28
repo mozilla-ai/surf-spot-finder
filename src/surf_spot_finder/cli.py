@@ -29,9 +29,9 @@ def find_surf_spot(
     config = Config.model_validate(yaml.safe_load(Path(config_file).read_text()))
 
     if not config.main_agent.instructions:
-        if config.main_agent.agent_framework == AgentFramework.SMOLAGENTS:
-            config.main_agent.instructions = SYSTEM_PROMPT
-        elif config.main_agent.agent_framework == AgentFramework.OPENAI:
+        if config.framework == AgentFramework.SMOLAGENTS:
+            config.instructions = SYSTEM_PROMPT
+        elif config.framework == AgentFramework.OPENAI:
             config.main_agent.instructions = SINGLE_AGENT_SYSTEM_PROMPT
 
     logger.info("Setting up tracing")
