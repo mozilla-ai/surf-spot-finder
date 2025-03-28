@@ -60,9 +60,6 @@ def run(test_case: TestCase, agent_config_path: str) -> str:
 
     logger.success("Done!")
 
-    # delete the agent to shut down the resources it manages
-    del agent
-
     return tracing_path
 
 
