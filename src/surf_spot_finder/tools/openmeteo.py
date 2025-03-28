@@ -69,6 +69,7 @@ def get_wave_forecast(lat: float, lon: float, date: str | None = None) -> list[d
     if date is not None:
         date = datetime.fromisoformat(date)
         hourly_data = _filter_by_date(date, hourly_data)
+    assert len(hourly_data) > 0, "No data found for the given date"
     return hourly_data
 
 
@@ -110,4 +111,5 @@ def get_wind_forecast(lat: float, lon: float, date: str | None = None) -> list[d
     if date is not None:
         date = datetime.fromisoformat(date)
         hourly_data = _filter_by_date(date, hourly_data)
+    assert len(hourly_data) > 0, "No data found for the given date"
     return hourly_data
