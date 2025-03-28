@@ -35,6 +35,10 @@ tests = [
   "evaluate>=0.4.3",
 ]
 
+dev = [
+    "pre-commit>=4.1.0",
+]
+
 [project.urls]
 Documentation = "https://mozilla-ai.github.io/surf-spot-finder/"
 Issues = "https://github.com/mozilla-ai/surf-spot-finder/issues"
@@ -46,11 +50,6 @@ where = ["src"]
 namespaces = false
 
 [tool.setuptools_scm]
-
-[dependency-groups]
-dev = [
-    "pre-commit>=4.1.0",
-]
 
 [project.scripts]
 surf-spot-finder = "surf_spot_finder.cli:main"

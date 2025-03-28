@@ -3,21 +3,23 @@ import os
 import sys
 from textwrap import dedent
 from typing import Any, Dict, List, Optional
-from loguru import logger
-from fire import Fire
+
 import pandas as pd
+from any_agent import AnyAgent
+from any_agent.telemetry import TelemetryProcessor
+from any_agent.tracing import get_tracer_provider, setup_tracing
+from fire import Fire
+from loguru import logger
+
 from surf_spot_finder.config import (
     Config,
 )
-from surf_spot_finder.evaluation.telemetry import TelemetryProcessor
 from surf_spot_finder.evaluation.evaluators import (
     CheckpointEvaluator,
-    QuestionAnsweringSquadEvaluator,
     HypothesisEvaluator,
+    QuestionAnsweringSquadEvaluator,
 )
 from surf_spot_finder.evaluation.test_case import TestCase
-from any_agent import AnyAgent
-from any_agent.tracing import get_tracer_provider, setup_tracing
 
 logger.remove()
 logger = logger.opt(ansi=True)
