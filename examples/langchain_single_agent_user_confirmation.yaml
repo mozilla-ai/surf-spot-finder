@@ -7,12 +7,13 @@ input_prompt_template: |
   in a {MAX_DRIVING_HOURS} hour driving radius, at {DATE}?
   Find a few options and then discuss it with David de la Iglesia Castro. You should recommend him some choices,
   and then confirm the final selection with him.
+  Once he gives the final selection, save a detailed description of the weather at the chosen location into a file
+  named "final_answer.txt". Also save a file called "history.txt" which has a list of your thought process in the choice.
 
 framework: langchain
 
 main_agent:
-  model_id: gpt-4o
-  # model_id: ollama/llama3.1:latest
+  model_id: openai/gpt-4o
   api_key_var: OPENAI_API_KEY
   tools:
   - "surf_spot_finder.tools.driving_hours_to_meters"
@@ -21,3 +22,17 @@ main_agent:
   - "surf_spot_finder.tools.get_wave_forecast"
   - "surf_spot_finder.tools.get_wind_forecast"
   - "any_agent.tools.send_console_message"
+  - command: "docker"
+    args:
+      - "run"
+      - "-i"
+      - "--rm"
+      - "--mount"
+      - "type=bind,src=/tmp/surf-spot-finder,dst=/projects"
+      - "mcp/filesystem"
+      - "/projects"
+    tools:
+      - "read_file"
+      - "write_file"
+      - "directory_tree"
+      - "list_allowed_directories"

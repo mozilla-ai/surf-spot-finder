@@ -1,4 +1,4 @@
-from any_agent import AnyAgent
+from any_agent import AgentFramework, AnyAgent
 import yaml
 from pathlib import Path
 
@@ -9,6 +9,9 @@ from surf_spot_finder.config import (
     Config,
 )
 from any_agent.tracing import get_tracer_provider, setup_tracing
+
+from surf_spot_finder.instructions.openai import SINGLE_AGENT_SYSTEM_PROMPT
+from surf_spot_finder.instructions.smolagents import SYSTEM_PROMPT
 
 
 @logger.catch(reraise=True)
@@ -24,6 +27,13 @@ def find_surf_spot(
     """
     logger.info(f"Loading {config_file}")
     config = Config.model_validate(yaml.safe_load(Path(config_file).read_text()))
+
+    if not config.main_agent.instructions:
+        if config.main_agent.agent_framework == AgentFramework.SMOLAGENTS:
+            config.main_agent.instructions = SYSTEM_PROMPT
+        elif config.main_agent.agent_framework == AgentFramework.OPENAI:
+            config.main_agent.instructions = SINGLE_AGENT_SYSTEM_PROMPT
+
 
     logger.info("Setting up tracing")
     tracer_provider, tracing_path = get_tracer_provider(
