@@ -34,7 +34,6 @@ def find_surf_spot(
         elif config.main_agent.agent_framework == AgentFramework.OPENAI:
             config.main_agent.instructions = SINGLE_AGENT_SYSTEM_PROMPT
 
-
     logger.info("Setting up tracing")
     tracer_provider, tracing_path = get_tracer_provider(
         project_name="surf-spot-finder", agent_framework=config.framework
