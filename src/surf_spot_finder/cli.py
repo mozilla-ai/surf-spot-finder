@@ -30,7 +30,7 @@ def find_surf_spot(
 
     if not config.main_agent.instructions:
         if config.framework == AgentFramework.SMOLAGENTS:
-            config.instructions = SYSTEM_PROMPT
+            config.main_agent.instructions = SYSTEM_PROMPT
         elif config.framework == AgentFramework.OPENAI:
             config.main_agent.instructions = SINGLE_AGENT_SYSTEM_PROMPT
 
