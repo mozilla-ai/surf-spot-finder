@@ -2,8 +2,11 @@ from typing import Dict, List, Any
 
 from surf_spot_finder.evaluation.evaluators.LLMEvaluator import LLMEvaluator
 from surf_spot_finder.evaluation.evaluators.schemas import EvaluationResult
-from surf_spot_finder.evaluation.telemetry import TelemetryProcessor
+from any_agent.telemetry import TelemetryProcessor
 from surf_spot_finder.evaluation.test_case import CheckpointCriteria
+from surf_spot_finder.utils.logging import get_logger
+
+logger = get_logger()
 
 
 class CheckpointEvaluator(LLMEvaluator):
@@ -27,6 +30,7 @@ class CheckpointEvaluator(LLMEvaluator):
             List of evaluation results
         """
         evidence = processor.extract_evidence(telemetry)
+        logger.info(f"""<yellow>Evidence\n{evidence}</yellow>\n""")
         results = []
 
         for checkpoint in checkpoints:

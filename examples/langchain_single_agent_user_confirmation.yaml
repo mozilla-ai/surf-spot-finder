@@ -14,7 +14,6 @@ framework: langchain
 
 main_agent:
   model_id: openai/gpt-4o
-  api_key_var: OPENAI_API_KEY
   tools:
   - "surf_spot_finder.tools.driving_hours_to_meters"
   - "surf_spot_finder.tools.get_area_lat_lon"
