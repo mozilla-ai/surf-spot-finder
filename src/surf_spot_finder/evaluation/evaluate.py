@@ -16,7 +16,7 @@ from surf_spot_finder.evaluation.evaluators import (
     HypothesisEvaluator,
 )
 from surf_spot_finder.evaluation.test_case import TestCase
-from any_agent import load_agent, run_agent
+from any_agent import AnyAgent
 from any_agent.tracing import get_tracer_provider, setup_tracing
 
 logger.remove()
@@ -40,9 +40,9 @@ def run(test_case: TestCase, agent_config_path: str) -> str:
 
     logger.info(f"Loading {config.framework} agent")
     logger.info(f"{config.managed_agents}")
-    agent = load_agent(
-        framework=config.framework,
-        main_agent=config.main_agent,
+    agent = AnyAgent.create(
+        agent_framework=config.framework,
+        agent_config=config.main_agent,
         managed_agents=config.managed_agents,
     )
 
@@ -52,7 +52,7 @@ def run(test_case: TestCase, agent_config_path: str) -> str:
         DATE=config.date,
     )
     logger.info(f"Running agent with query:\n{query}")
-    run_agent(agent, query)
+    agent.run(query)
 
     logger.success("Done!")
 
