@@ -9,11 +9,12 @@ license = {text = "Apache-2.0"}
 requires-python = ">=3.11"
 dynamic = ["version"]
 dependencies = [
-  "any-agent  @ git+ssh://git@github.com/mozilla-ai/any-agent",
+  "any-agent[smolagents,mcp,openai,langchain,llama_index]  @ git+ssh://git@github.com/mozilla-ai/any-agent",
   "fire",
   "loguru",
   "pydantic",
   "pyyaml",
+  "litellm",
 ]
 
 [project.optional-dependencies]

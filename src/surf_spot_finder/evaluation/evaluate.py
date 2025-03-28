@@ -1,15 +1,11 @@
 import json
-import os
-import sys
 from textwrap import dedent
 from typing import Any, Dict, List, Optional
 
-import pandas as pd
 from any_agent import AnyAgent
 from any_agent.telemetry import TelemetryProcessor
 from any_agent.tracing import get_tracer_provider, setup_tracing
 from fire import Fire
-from loguru import logger
 
 from surf_spot_finder.config import (
     Config,
@@ -20,10 +16,11 @@ from surf_spot_finder.evaluation.evaluators import (
     QuestionAnsweringSquadEvaluator,
 )
 from surf_spot_finder.evaluation.test_case import TestCase
+from surf_spot_finder.evaluation.results_saver import save_evaluation_results
+from surf_spot_finder.utils.logging import get_logger
 
-logger.remove()
-logger = logger.opt(ansi=True)
-logger.add(sys.stdout, colorize=True, format="{message}")
+# Replace the existing logger setup with the shared logger
+logger = get_logger()
 
 
 def run(test_case: TestCase, agent_config_path: str) -> str:
@@ -139,32 +136,21 @@ def evaluate_telemetry(test_case: TestCase, telemetry_path: str) -> bool:
     )
     output_message += "<green>=====================================</green>\n"
     logger.info(output_message)
-    # See if the test_case.output_path file exists.
-    if os.path.exists(test_case.output_path):
-        df = pd.read_json(test_case.output_path, orient="records", lines=True)
-    else:
-        df = pd.DataFrame()
-    df = pd.concat(
-        [
-            df,
-            pd.DataFrame(
-                [
-                    {
-                        "test_case_path": test_case.test_case_path,
-                        "output_message": output_message,
-                        "telemetry_path": telemetry_path,
-                        "hypothesis_answer": hypothesis_answer,
-                        "passed_checks": len(passed_checks),
-                        "failed_checks": len(failed_checks),
-                        "score": round(
-                            won_points / (won_points + missed_points) * 100, 2
-                        ),
-                    }
-                ]
-            ),
-        ]
+
+    # Calculate score as a percentage
+    score = won_points / (won_points + missed_points) * 100
+
+    # Save the evaluation results
+    save_evaluation_results(
+        test_case_path=test_case.test_case_path,
+        output_path=test_case.output_path,
+        output_message=output_message,
+        telemetry_path=telemetry_path,
+        hypothesis_answer=hypothesis_answer,
+        passed_checks=len(passed_checks),
+        failed_checks=len(failed_checks),
+        score=score,
     )
-    df.to_json(test_case.output_path, orient="records", lines=True)
 
 
 def evaluate(
