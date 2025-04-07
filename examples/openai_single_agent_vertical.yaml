@@ -1,5 +1,5 @@
 location: Pontevedra
-date: 2025-04-02 12:00
+date: 2025-04-10 12:00
 max_driving_hours: 2
 
 framework: openai
@@ -12,6 +12,6 @@ main_agent:
   - "surf_spot_finder.tools.get_surfing_spots"
   - "surf_spot_finder.tools.get_wave_forecast"
   - "surf_spot_finder.tools.get_wind_forecast"
-  - "surf_spot_finder.tools.search_web"
-  - "surf_spot_finder.tools.show_plan"
-  - "surf_spot_finder.tools.visit_webpage"
+  - "any_agent.tools.search_web"
+  - "any_agent.tools.show_plan"
+  - "any_agent.tools.visit_webpage"

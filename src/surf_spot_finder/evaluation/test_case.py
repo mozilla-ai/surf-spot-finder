@@ -3,6 +3,8 @@ from pydantic import BaseModel, Field, ConfigDict
 import yaml
 from litellm import validate_environment
 
+from surf_spot_finder.config import Config
+
 
 class InputModel(BaseModel):
     """Input configuration for the surf spot finder test case"""
@@ -30,10 +32,12 @@ class TestCase(BaseModel):
     llm_judge: str
     final_answer_criteria: List[CheckpointCriteria] = Field(default_factory=list)
     test_case_path: str
+    agent_config_path: str
+    agent_config: Config
     output_path: str = "output/results.json"
 
     @classmethod
-    def from_yaml(cls, test_case_path: str) -> "TestCase":
+    def from_yaml(cls, test_case_path: str, agent_config_path: str) -> "TestCase":
         """Load a test case from a YAML file and process it"""
         with open(test_case_path, "r") as f:
             test_case_dict = yaml.safe_load(f)
@@ -64,6 +68,19 @@ class TestCase(BaseModel):
             ]
 
         test_case_dict["test_case_path"] = test_case_path
+        test_case_dict["agent_config_path"] = agent_config_path
+        with open(agent_config_path, "r") as f:
+            agent_config_dict = yaml.safe_load(f)
+        agent_config_dict["location"] = test_case_dict["input"]["location"]
+        agent_config_dict["date"] = test_case_dict["input"]["date"]
+        agent_config_dict["max_driving_hours"] = test_case_dict["input"][
+            "max_driving_hours"
+        ]
+        agent_config_dict["input_prompt_template"] = test_case_dict["input"][
+            "input_prompt_template"
+        ]
+        agent_config = Config.model_validate(agent_config_dict)
+        test_case_dict["agent_config"] = agent_config
         # verify that the llm_judge is a valid litellm model
         validate_environment(test_case_dict["llm_judge"])
         return cls.model_validate(test_case_dict)

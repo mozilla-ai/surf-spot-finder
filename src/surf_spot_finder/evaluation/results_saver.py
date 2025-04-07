@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 
+from surf_spot_finder.evaluation.test_case import TestCase
 from surf_spot_finder.utils.logging import get_logger
 
 # Use the shared logger
@@ -8,7 +9,7 @@ logger = get_logger()
 
 
 def save_evaluation_results(
-    test_case_path: str,
+    test_case: TestCase,
     output_path: str,
     output_message: str,
     telemetry_path: str,
@@ -21,7 +22,8 @@ def save_evaluation_results(
     Save evaluation results to the specified output path.
 
     Args:
-        test_case_path: Path to the test case file
+        test_case: Path to the test case file
+        agent_config: Path to the agent configuration file
         output_path: Path to save the results
         output_message: Formatted output message with evaluation details
         telemetry_path: Path to the telemetry file used
@@ -44,7 +46,9 @@ def save_evaluation_results(
             pd.DataFrame(
                 [
                     {
-                        "test_case_path": test_case_path,
+                        "config": test_case.model_dump(),
+                        "agent_config_path": test_case.agent_config_path,
+                        "test_case_path": test_case.test_case_path,
                         "output_message": output_message,
                         "telemetry_path": telemetry_path,
                         "hypothesis_answer": hypothesis_answer,

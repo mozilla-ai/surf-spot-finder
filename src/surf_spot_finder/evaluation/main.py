@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Optional
 
 from any_agent import AnyAgent
 from any_agent.telemetry import TelemetryProcessor
-from any_agent.tracing import get_tracer_provider, setup_tracing
+from any_agent.tracing import setup_tracing
 from fire import Fire
 
 from surf_spot_finder.config import (
@@ -23,37 +23,22 @@ from surf_spot_finder.utils.logging import get_logger
 logger = get_logger()
 
 
-def run(test_case: TestCase, agent_config_path: str) -> str:
-    input_data = test_case.input
-
-    logger.info("Loading config")
-    config = Config.from_yaml(agent_config_path)
-    # pretty print
-    logger.info(
-        f"Overriding config with test case input:\n{json.dumps(input_data.model_dump(), indent=2)}"
-    )
-    config.location = input_data.location
-    config.date = input_data.date
-    config.max_driving_hours = input_data.max_driving_hours
-    config.input_prompt_template = input_data.input_prompt_template
+def run(agent_config: Config) -> str:
     logger.info("Setting up tracing")
-    tracer_provider, tracing_path = get_tracer_provider(
-        project_name="surf-spot-finder", agent_framework=config.framework
-    )
-    setup_tracing(tracer_provider, config.framework)
+    tracing_path = setup_tracing(agent_config.framework, "output")
 
-    logger.info(f"Loading {config.framework} agent")
-    logger.info(f"{config.managed_agents}")
+    logger.info(f"Loading {agent_config.framework} agent")
+    logger.info(f"{agent_config.managed_agents}")
     agent = AnyAgent.create(
-        agent_framework=config.framework,
-        agent_config=config.main_agent,
-        managed_agents=config.managed_agents,
+        agent_framework=agent_config.framework,
+        agent_config=agent_config.main_agent,
+        managed_agents=agent_config.managed_agents,
     )
 
-    query = config.input_prompt_template.format(
-        LOCATION=config.location,
-        MAX_DRIVING_HOURS=config.max_driving_hours,
-        DATE=config.date,
+    query = agent_config.input_prompt_template.format(
+        LOCATION=agent_config.location,
+        MAX_DRIVING_HOURS=agent_config.max_driving_hours,
+        DATE=agent_config.date,
     )
     logger.info(f"Running agent with query:\n{query}")
     agent.run(query)
@@ -148,7 +133,7 @@ def evaluate_telemetry(test_case: TestCase, telemetry_path: str) -> bool:
 
     # Save the evaluation results
     save_evaluation_results(
-        test_case_path=test_case.test_case_path,
+        test_case=test_case,
         output_path=test_case.output_path,
         output_message=output_message,
         telemetry_path=telemetry_path,
@@ -171,7 +156,9 @@ def evaluate(
         telemetry_path: Optional path to an existing telemetry file. If not provided,
                         the agent will be run to generate one.
     """
-    test_case = TestCase.from_yaml(test_case_path=test_case_path)
+    test_case = TestCase.from_yaml(
+        test_case_path=test_case_path, agent_config_path=agent_config_path
+    )
 
     if telemetry_path is None:
         logger.info(
@@ -180,7 +167,7 @@ def evaluate(
         assert (
             agent_config_path is not None
         ), "Agent config path must be provided if running agent"
-        telemetry_path = run(test_case, agent_config_path)
+        telemetry_path = run(test_case.agent_config)
     else:
         logger.info(f"Using provided telemetry file: {telemetry_path}")
         logger.info(

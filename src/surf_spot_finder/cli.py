@@ -8,7 +8,7 @@ from loguru import logger
 from surf_spot_finder.config import (
     Config,
 )
-from any_agent.tracing import get_tracer_provider, setup_tracing
+from any_agent.tracing import setup_tracing
 
 from surf_spot_finder.instructions.openai import SINGLE_AGENT_SYSTEM_PROMPT
 from surf_spot_finder.instructions.smolagents import SYSTEM_PROMPT
@@ -35,10 +35,7 @@ def find_surf_spot(
             config.main_agent.instructions = SINGLE_AGENT_SYSTEM_PROMPT
 
     logger.info("Setting up tracing")
-    tracer_provider, tracing_path = get_tracer_provider(
-        project_name="surf-spot-finder", agent_framework=config.framework
-    )
-    setup_tracing(tracer_provider, config.framework)
+    tracing_path = setup_tracing(config.framework, "output")
 
     logger.info(f"Loading {config.framework} agent")
     logger.info(f"{config.managed_agents}")

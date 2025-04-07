@@ -1,0 +1,26 @@
+framework: smolagents
+
+main_agent:
+  model_id: openai/gpt-4o-mini
+  tools:
+  - "surf_spot_finder.tools.driving_hours_to_meters"
+  - "surf_spot_finder.tools.get_area_lat_lon"
+  - "surf_spot_finder.tools.get_surfing_spots"
+  - "surf_spot_finder.tools.get_wave_forecast"
+  - "surf_spot_finder.tools.get_wind_forecast"
+  - "any_agent.tools.send_console_message"
+  - "smolagents.FinalAnswerTool"
+  - command: "docker"
+    args:
+      - "run"
+      - "-i"
+      - "--rm"
+      - "--mount"
+      - "type=bind,src=/tmp/surf-spot-finder,dst=/projects"
+      - "mcp/filesystem"
+      - "/projects"
+    tools:
+      - "read_file"
+      - "write_file"
+      - "directory_tree"
+      - "list_allowed_directories"

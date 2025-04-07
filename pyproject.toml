@@ -37,7 +37,9 @@ tests = [
 ]
 
 dev = [
-    "pre-commit>=4.1.0",
+  "pre-commit>=4.1.0",
+  "ipykernel>=6.29.5",
+  "jupyter>=1.1.1",
 ]
 
 [project.urls]
