@@ -1,11 +1,11 @@
-location: Pontevedra
-date: 2025-04-10 12:00
-max_driving_hours: 2
+location: Lisbon
+date: 2025-04-08 19:00
+max_driving_hours: 1
 
 framework: openai
 
 main_agent:
-  model_id: o3-mini
+  model_id: gpt-4o
   tools:
   - "surf_spot_finder.tools.driving_hours_to_meters"
   - "surf_spot_finder.tools.get_area_lat_lon"
@@ -13,5 +13,4 @@ main_agent:
   - "surf_spot_finder.tools.get_wave_forecast"
   - "surf_spot_finder.tools.get_wind_forecast"
   - "any_agent.tools.search_web"
-  - "any_agent.tools.show_plan"
   - "any_agent.tools.visit_webpage"

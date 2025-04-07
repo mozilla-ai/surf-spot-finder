@@ -6,21 +6,32 @@ from any_agent import AnyAgent
 from any_agent.telemetry import TelemetryProcessor
 from any_agent.tracing import setup_tracing
 from fire import Fire
+from pydantic import BaseModel, ConfigDict
 
 from surf_spot_finder.config import (
     Config,
 )
-from surf_spot_finder.evaluation.evaluators import (
+from any_agent.evaluation.evaluators import (
     CheckpointEvaluator,
     HypothesisEvaluator,
     QuestionAnsweringSquadEvaluator,
 )
-from surf_spot_finder.evaluation.test_case import TestCase
-from surf_spot_finder.evaluation.results_saver import save_evaluation_results
-from surf_spot_finder.utils.logging import get_logger
+from any_agent.evaluation.test_case import TestCase
+from any_agent.evaluation.results_saver import save_evaluation_results
+from any_agent.evaluation.logging import get_logger
 
 # Replace the existing logger setup with the shared logger
 logger = get_logger()
+
+
+class InputModel(BaseModel):
+    """Input configuration for an evaluation test case"""
+
+    model_config = ConfigDict(extra="forbid")
+    location: str
+    date: str
+    max_driving_hours: int
+    input_prompt_template: str | None = None
 
 
 def run(agent_config: Config) -> str:
@@ -167,7 +178,8 @@ def evaluate(
         assert (
             agent_config_path is not None
         ), "Agent config path must be provided if running agent"
-        telemetry_path = run(test_case.agent_config)
+        agent_config = Config(**test_case.agent_config_dict)
+        telemetry_path = run(agent_config)
     else:
         logger.info(f"Using provided telemetry file: {telemetry_path}")
         logger.info(
