@@ -1,19 +1,17 @@
-from any_agent import AgentFramework, AnyAgent
-
+from any_agent import AgentFramework, AnyAgent, TracingConfig
 from fire import Fire
 from loguru import logger
 
 from surf_spot_finder.config import (
     Config,
 )
-from any_agent.tracing import setup_tracing
 
 from surf_spot_finder.instructions.openai import SINGLE_AGENT_SYSTEM_PROMPT
 from surf_spot_finder.instructions.smolagents import SYSTEM_PROMPT
 
 
 @logger.catch(reraise=True)
-def find_surf_spot(
+async def find_surf_spot(
     config_file: str,
 ) -> str:
     """Find the best surf spot based on the given criteria.
@@ -32,15 +30,13 @@ def find_surf_spot(
         elif config.framework == AgentFramework.OPENAI:
             config.main_agent.instructions = SINGLE_AGENT_SYSTEM_PROMPT
 
-    logger.info("Setting up tracing")
-    tracing_path = setup_tracing(config.framework, "output")
-
     logger.info(f"Loading {config.framework} agent")
     logger.info(f"{config.managed_agents}")
-    agent = AnyAgent.create(
+    agent = await AnyAgent.create_async(
         agent_framework=config.framework,
         agent_config=config.main_agent,
         managed_agents=config.managed_agents,
+        tracing=TracingConfig(console=True, cost_info=True),
     )
 
     query = config.input_prompt_template.format(
@@ -49,11 +45,9 @@ def find_surf_spot(
         DATE=config.date,
     )
     logger.info(f"Running agent with query:\n{query}")
-    agent.run(query)
+    agent_trace = await agent.run_async(query)
 
-    logger.success("Done!")
-
-    return tracing_path
+    logger.info(f"Final result:\n{agent_trace.final_output}")
 
 
 def main():

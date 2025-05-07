@@ -56,6 +56,21 @@ class Config(BaseModel):
                 print(f"Importing {tool}")
                 callables.append(getattr(module, func_name))
             else:
-                # this means it must be an MCPTool
+                # this means it must be an MCPStdioParams
                 callables.append(tool)
+        data["main_agent"]["tools"] = callables
+        for agent in data.get("managed_agents", []):
+            callables = []
+            for tool in agent.get("tools", []):
+                if isinstance(tool, str):
+                    module_name, func_name = tool.rsplit(".", 1)
+                    module = __import__(module_name, fromlist=[func_name])
+                    print(f"Importing {tool}")
+                    callables.append(getattr(module, func_name))
+                else:
+                    # this means it must be an MCPStdioParams
+                    callables.append(tool)
+            agent["tools"] = callables
+
+        data["framework"] = AgentFramework[data["framework"]]
         return cls(**data)
