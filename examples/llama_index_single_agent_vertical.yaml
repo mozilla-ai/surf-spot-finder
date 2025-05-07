@@ -1,11 +1,16 @@
-location: Pontevedra
-date: 2025-04-10 12:00
+location: Pittsburgh
+date: 2025-06-01 12:00
 max_driving_hours: 2
+input_prompt_template: |
+  According to the forecast, what will be the best spot to surf around {LOCATION},
+  in a {MAX_DRIVING_HOURS} hour driving radius, at {DATE}?
+  Find a few options and then discuss it with the user by sending a console message. You should recommend them some choices,
+  and then confirm the final selection with them. Your final answer should contain the surf spot as well as the wave and wind forecast.
 
-framework: llama_index
+framework: OPENAI
 
 main_agent:
-  model_id: o3-mini
+  model_id: gpt-4o
   tools:
   - "surf_spot_finder.tools.driving_hours_to_meters"
   - "surf_spot_finder.tools.get_area_lat_lon"
@@ -14,4 +19,5 @@ main_agent:
   - "surf_spot_finder.tools.get_wind_forecast"
   - "any_agent.tools.search_web"
   - "any_agent.tools.show_plan"
+  - "any_agent.tools.send_console_message"
   - "any_agent.tools.visit_webpage"
