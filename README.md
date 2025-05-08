@@ -49,7 +49,7 @@ pip install -e .  # Install root project dependencies
 ### 3️⃣ Run
 
 ```bash
-surf-spot-finder examples/single_agent.yaml
+surf-spot-finder examples/single_agent_with_tools.yaml
 ```
 
 ## How it Works
