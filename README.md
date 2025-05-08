@@ -49,7 +49,6 @@ pip install -e .  # Install root project dependencies
 ### 3️⃣ Run
 
 ```bash
-export OPENAI_API_KEY=yourkeyhere
 surf-spot-finder
 ```
 
