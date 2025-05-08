@@ -1,5 +1,5 @@
 main_agent:
-  model_id: gpt-4o
+  model_id: # optional, will prompt for it if not provided
   tools:
   - "surf_spot_finder.tools.driving_hours_to_meters"
   - "surf_spot_finder.tools.get_area_lat_lon"

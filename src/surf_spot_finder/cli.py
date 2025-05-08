@@ -4,7 +4,7 @@ from pathlib import Path
 
 from any_agent import AgentFramework, AnyAgent, TracingConfig
 from fire import Fire
-from loguru import logger
+from any_agent.logging import logger
 
 from surf_spot_finder.config import (
     Config,
@@ -14,9 +14,8 @@ from surf_spot_finder.instructions.openai import SINGLE_AGENT_SYSTEM_PROMPT
 from surf_spot_finder.instructions.smolagents import SYSTEM_PROMPT
 
 
-@logger.catch(reraise=True)
 async def find_surf_spot(
-    config_file: str,
+    config_file: str | None = None,
 ) -> str:
     """Find the best surf spot based on the given criteria.
 
@@ -25,8 +24,11 @@ async def find_surf_spot(
             See [Config][surf_spot_finder.config.Config]
 
     """
-    logger.info(f"Loading {config_file}")
-    config = Config.from_yaml(config_file)
+    if config_file is None:
+        config = Config.from_dict({})
+    else:
+        logger.info(f"Loading {config_file}")
+        config = Config.from_yaml(config_file)
 
     if not config.main_agent.instructions:
         if config.framework == AgentFramework.SMOLAGENTS:
@@ -60,10 +62,6 @@ async def find_surf_spot(
     file_path = Path(output_dir) / f"{timestamp}_trace.json"
     with open(file_path, "w") as f:
         f.write(agent_trace.model_dump_json(indent=2))
-    # dump the config alongside it
-    config_file_path = Path(output_dir) / f"{timestamp}_config.json"
-    with open(config_file_path, "w") as f:
-        f.write(config.model_dump_json(indent=2))
 
 
 def main():

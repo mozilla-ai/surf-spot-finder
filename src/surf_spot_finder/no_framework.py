@@ -3,7 +3,7 @@ from datetime import datetime
 
 from fire import Fire
 from litellm import completion
-from loguru import logger
+from any_agent.logging import logger
 from pydantic import BaseModel
 
 from any_agent.tools.web_browsing import search_web, visit_webpage
@@ -23,7 +23,6 @@ class SpotScore(BaseModel):
     reason: str
 
 
-@logger.catch(reraise=True)
 def find_surf_spot_no_framework(
     location: str, max_driving_hours: int, date: datetime, model_id: str
 ) -> list[SpotScore]:
