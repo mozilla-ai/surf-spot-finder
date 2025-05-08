@@ -3,8 +3,10 @@ import os
 from pathlib import Path
 
 from any_agent import AgentFramework, AnyAgent, TracingConfig
+from any_agent.evaluation.schemas import TraceEvaluationResult
 from fire import Fire
 from any_agent.logging import logger
+from any_agent.evaluation import evaluate
 
 from surf_spot_finder.config import (
     Config,
@@ -27,7 +29,7 @@ async def find_surf_spot(
     if config_file is None:
         config = Config.from_dict({})
     else:
-        logger.info(f"Loading {config_file}")
+        logger.info("Loading %s", config_file)
         config = Config.from_yaml(config_file)
 
     if not config.main_agent.instructions:
@@ -36,8 +38,8 @@ async def find_surf_spot(
         elif config.framework == AgentFramework.OPENAI:
             config.main_agent.instructions = SINGLE_AGENT_SYSTEM_PROMPT
 
-    logger.info(f"Loading {config.framework} agent")
-    logger.info(f"{config.managed_agents}")
+    logger.info("Loading %s agent", config.framework)
+    logger.info("Managed agents: %s", config.managed_agents)
     agent = await AnyAgent.create_async(
         agent_framework=config.framework,
         agent_config=config.main_agent,
@@ -50,10 +52,10 @@ async def find_surf_spot(
         MAX_DRIVING_HOURS=config.max_driving_hours,
         DATE=config.date,
     )
-    logger.info(f"Running agent with query:\n{query}")
+    logger.info("Running agent with query:\n%s", query)
     agent_trace = await agent.run_async(query)
 
-    logger.info(f"Final output from agent:\n{agent_trace.final_output}")
+    logger.info("Final output from agent:\n%s", agent_trace.final_output)
 
     # dump the trace in the "output" directory
     output_dir = "output"
@@ -62,6 +64,38 @@ async def find_surf_spot(
     file_path = Path(output_dir) / f"{timestamp}_trace.json"
     with open(file_path, "w") as f:
         f.write(agent_trace.model_dump_json(indent=2))
+
+    if config.evaluation_cases is not None:
+        results = []
+        logger.info("Found evaluation cases, running trace evaluation")
+        for i, case in enumerate(config.evaluation_cases):
+            logger.info("Evaluating case: %s", case)
+            result: TraceEvaluationResult = evaluate(
+                evaluation_case=case,
+                trace=agent_trace,
+                agent_framework=config.framework,
+            )
+            for list_of_checkpoints in [
+                result.checkpoint_results,
+                result.direct_results,
+                result.hypothesis_answer_results,
+            ]:
+                for checkpoint in list_of_checkpoints:
+                    msg = (
+                        f"Checkpoint: {checkpoint.criteria}\n"
+                        f"\tPassed: {checkpoint.passed}\n"
+                        f"\tReason: {checkpoint.reason}\n"
+                        f"\tScore: {'%d/%d' % (checkpoint.points, checkpoint.points) if checkpoint.passed else '0/%d' % checkpoint.points}"
+                    )
+                    logger.info(msg)
+            logger.info("==========================")
+            logger.info("Overall Score: %d%%", 100 * result.score)
+            logger.info("==========================")
+            results.append(result)
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        file_path = Path(output_dir) / f"{timestamp}_eval_case_{i}.json"
+        with open(file_path, "w") as f:
+            f.write(result.model_dump_json(indent=2))
 
 
 def main():

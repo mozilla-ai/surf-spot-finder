@@ -8,6 +8,7 @@ from pydantic import AfterValidator, BaseModel, ConfigDict, FutureDatetime, Posi
 import yaml
 from rich.prompt import Prompt
 from any_agent.logging import logger
+from any_agent.evaluation import EvaluationCase
 import geocoder
 from litellm.litellm_core_utils.get_llm_provider_logic import (
     get_llm_provider,
@@ -36,7 +37,7 @@ def ask_framework() -> AgentFramework:
         [f"{i}: {framework}" for i, framework in enumerate(frameworks)]
     )
     prompt = f"Select the agent framework to use:\n{frameworks_str}\n"
-    choice = Prompt.ask(prompt, default="3")
+    choice = Prompt.ask(prompt, default="0")
     try:
         choice = int(choice)
         if choice < 0 or choice >= len(frameworks):
@@ -148,6 +149,8 @@ class Config(BaseModel):
     main_agent: AgentConfig
     managed_agents: list[AgentConfig] | None = None
 
+    evaluation_cases: list[EvaluationCase] | None = None
+
     @classmethod
     def from_dict(cls, data: dict) -> "Config":
         """
@@ -212,6 +215,7 @@ class Config(BaseModel):
             data["date"] = date_picker()
         else:
             logger.info(f"Using date {data['date']}")
+
         return cls(**data)
 
     @classmethod
