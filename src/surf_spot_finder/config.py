@@ -116,7 +116,7 @@ class Config(BaseModel):
             data = yaml.safe_load(f)
         # for each tool listed in main_agent.tools, use import lib to import it and replace the str with the callable
         callables = []
-        for tool in data["main_agent"]["tools"]:
+        for tool in data["main_agent"].get("tools", []):
             if isinstance(tool, str):
                 module_name, func_name = tool.rsplit(".", 1)
                 module = __import__(module_name, fromlist=[func_name])
