@@ -1,8 +1,0 @@
-location: Pontevedra
-date: 2025-04-02 12:00
-max_driving_hours: 2
-
-framework: langchain
-
-main_agent:
-  model_id: o3-mini

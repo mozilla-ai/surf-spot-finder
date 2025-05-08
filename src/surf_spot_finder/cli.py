@@ -1,3 +1,7 @@
+import datetime
+import os
+from pathlib import Path
+
 from any_agent import AgentFramework, AnyAgent, TracingConfig
 from fire import Fire
 from loguru import logger
@@ -47,7 +51,19 @@ async def find_surf_spot(
     logger.info(f"Running agent with query:\n{query}")
     agent_trace = await agent.run_async(query)
 
-    logger.info(f"Final result:\n{agent_trace.final_output}")
+    logger.info(f"Final output from agent:\n{agent_trace.final_output}")
+
+    # dump the trace in the "output" directory
+    output_dir = "output"
+    os.makedirs(output_dir, exist_ok=True)
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    file_path = Path(output_dir) / f"{timestamp}_trace.json"
+    with open(file_path, "w") as f:
+        f.write(agent_trace.model_dump_json(indent=2))
+    # dump the config alongside it
+    config_file_path = Path(output_dir) / f"{timestamp}_config.json"
+    with open(config_file_path, "w") as f:
+        f.write(config.model_dump_json(indent=2))
 
 
 def main():
