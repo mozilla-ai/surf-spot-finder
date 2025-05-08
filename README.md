@@ -50,7 +50,7 @@ pip install -e .  # Install root project dependencies
 
 ```bash
 export OPENAI_API_KEY=yourkeyhere
-surf-spot-finder --location="Pittsburgh Pennsylvania" --date="2025-03-11 22:00" --max-driving-hours=5 --model-id="openai/o1" --api-key-var="OPENAI_API_KEY"
+surf-spot-finder
 ```
 
 ## How it Works
@@ -78,12 +78,6 @@ pip install -e .[tests]
 
 ```bash
 pytest
-```
-
-### Integration Tests
-
-```bash
-INTEGRATION_TESTS=Y pytest # Requires docker and OPENAI_API_KEY
 ```
 
 ## Troubleshooting
