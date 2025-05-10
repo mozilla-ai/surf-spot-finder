@@ -10,7 +10,8 @@
 </p>
 
 <div align="center">
-    <a href="https://huggingface.co/spaces/mozilla-ai/surf-spot-finder" target="_blank">Huggingface Demo 🤗</a>
+  <p><a href="https://huggingface.co/spaces/mozilla-ai/surf-spot-finder" target="_blank">Huggingface Demo 🤗</a></p>
+
 </div>
 
 
