@@ -1,3 +1,5 @@
+import json
+from typing import Any
 import streamlit as st
 from surf_spot_finder.tools import (
     driving_hours_to_meters,
@@ -8,17 +10,22 @@ from surf_spot_finder.tools import (
 )
 from surf_spot_finder.config import Config
 from any_agent import AgentConfig, AnyAgent, TracingConfig
+from any_agent.tracing.trace import AgentTrace
+from any_agent.tracing.otel_types import StatusCode
 from any_agent.evaluation import evaluate, TraceEvaluationResult
 
 
-async def run_agent(user_inputs):
-    st.write("Running surf spot finder...")
+async def run_agent(user_inputs: dict[str, Any]):
+    st.markdown("### 🔍 Running Surf Spot Finder...")
+
     if "huggingface" in user_inputs["model_id"]:
         model_args = {
             "extra_headers": {"X-HF-Bill-To": "mozilla-ai"},
+            "temperature": 0.0,
         }
     else:
         model_args = {}
+
     agent_config = AgentConfig(
         model_id=user_inputs["model_id"],
         model_args=model_args,
@@ -30,6 +37,7 @@ async def run_agent(user_inputs):
             driving_hours_to_meters,
         ],
     )
+
     config = Config(
         location=user_inputs["location"],
         max_driving_hours=user_inputs["max_driving_hours"],
@@ -37,7 +45,9 @@ async def run_agent(user_inputs):
         framework=user_inputs["framework"],
         main_agent=agent_config,
         managed_agents=[],
-        evaluation_cases=None,
+        evaluation_cases=[user_inputs.get("evaluation_case")]
+        if user_inputs.get("evaluation_case")
+        else None,
     )
 
     agent = await AnyAgent.create_async(
@@ -52,43 +62,91 @@ async def run_agent(user_inputs):
         MAX_DRIVING_HOURS=config.max_driving_hours,
         DATE=config.date,
     )
-    st.write("Running agent with query:\n", query)
 
-    with st.spinner("Running..."):
-        agent_trace = await agent.run_async(query)
+    st.markdown("#### 📝 Query")
+    st.code(query, language="text")
+
+    with st.spinner("🤔 Analyzing surf spots..."):
+        agent_trace: AgentTrace = await agent.run_async(query)
         agent.exit()
 
-    st.write("Final output from agent:\n", agent_trace.final_output)
+    st.markdown("### 🏄 Results")
+    st.markdown("#### Final Output")
+    st.info(agent_trace.final_output)
 
-    # Display the agent trace
-    with st.expander("Agent Trace", expanded=True):
-        st.write(agent_trace.spans)
+    # Display the agent trace in a more organized way
+    with st.expander("### 🧩 Agent Trace"):
+        for span in agent_trace.spans:
+            # Header with name and status
+            col1, col2 = st.columns([4, 1])
+            with col1:
+                st.markdown(f"**{span.name}**")
+                if span.attributes:
+                    # st.json(span.attributes, expanded=False)
+                    if "input.value" in span.attributes:
+                        input_value = json.loads(span.attributes["input.value"])
+                        if isinstance(input_value, list):
+                            st.write(f"Input: {input_value[-1]}")
+                        else:
+                            st.write(f"Input: {input_value}")
+                    if "output.value" in span.attributes:
+                        output_value = json.loads(span.attributes["output.value"])
+                        if isinstance(output_value, list):
+                            st.write(f"Output: {output_value[-1]}")
+                        else:
+                            st.write(f"Output: {output_value}")
+            with col2:
+                status_color = (
+                    "green" if span.status.status_code == StatusCode.OK else "red"
+                )
+                st.markdown(
+                    f"<span style='color: {status_color}'>● {span.status.status_code.name}</span>",
+                    unsafe_allow_html=True,
+                )
 
     if config.evaluation_cases is not None:
-        results = []
-        st.write("Found evaluation cases, running trace evaluation")
-        for i, case in enumerate(config.evaluation_cases):
-            st.write("Evaluating case: ", case)
+        assert (
+            len(config.evaluation_cases) == 1
+        ), "Only one evaluation case is supported in the demo"
+        st.markdown("### 📊 Evaluation Results")
+
+        with st.spinner("Evaluating results..."):
+            case = config.evaluation_cases[0]
             result: TraceEvaluationResult = evaluate(
                 evaluation_case=case,
                 trace=agent_trace,
                 agent_framework=config.framework,
             )
-            for list_of_checkpoints in [
-                result.checkpoint_results,
-                result.direct_results,
-                result.hypothesis_answer_results,
-            ]:
-                for checkpoint in list_of_checkpoints:
-                    msg = (
-                        f"Checkpoint: {checkpoint.criteria}\n"
-                        f"\tPassed: {checkpoint.passed}\n"
-                        f"\tReason: {checkpoint.reason}\n"
-                        f"\tScore: {'%d/%d' % (checkpoint.points, checkpoint.points) if checkpoint.passed else '0/%d' % checkpoint.points}"
-                    )
-                    st.write(msg)
-            st.write("==========================")
-            st.write("Overall Score: %d%%", 100 * result.score)
-            st.write("==========================")
-            results.append(result)
-    st.write("Surf spot finder finished running.")
+
+            all_results = (
+                result.checkpoint_results
+                + result.hypothesis_answer_results
+                + result.direct_results
+            )
+
+            # Create columns for better layout
+            col1, col2 = st.columns(2)
+
+            with col1:
+                st.markdown("#### Criteria Results")
+                for checkpoint in all_results:
+                    if checkpoint.passed:
+                        st.success(f"✅ {checkpoint.criteria}")
+                    else:
+                        st.error(f"❌ {checkpoint.criteria}")
+
+            with col2:
+                st.markdown("#### Overall Score")
+                total_points = sum([result.points for result in all_results])
+                if total_points == 0:
+                    msg = "Total points is 0, cannot calculate score."
+                    raise ValueError(msg)
+                passed_points = sum(
+                    [result.points for result in all_results if result.passed]
+                )
+
+                # Create a nice score display
+                st.markdown(f"### {passed_points}/{total_points}")
+                percentage = (passed_points / total_points) * 100
+                st.progress(percentage / 100)
+                st.markdown(f"**{percentage:.1f}%**")
