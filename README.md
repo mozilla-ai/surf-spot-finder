@@ -10,11 +10,25 @@
 </p>
 
 <div align="center">
-  <p><a href="https://huggingface.co/spaces/mozilla-ai/surf-spot-finder" target="_blank">Huggingface Demo 🤗</a></p>
+
+![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
+[![](https://dcbadge.limes.pink/api/server/YuMNeuKStr?style=flat)](https://discord.gg/YuMNeuKStr) <br>
+[![Try on Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Try%20on-Spaces-blue)](https://huggingface.co/spaces/mozilla-ai/speaches-demo)
+[![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?logo=streamlit&logoColor=white)](https://streamlit.io/)
+[![LiteLLM](https://img.shields.io/badge/🚅%20LiteLLM-1E90FF)](https://www.litellm.ai/)
+[![Any-Agent](https://img.shields.io/badge/🎨%20Any--Agent-white)](https://github.com/mozilla-ai/any-agent) <br>
+[![Docs](https://github.com/mozilla-ai/surf-spot-finder/actions/workflows/docs.yaml/badge.svg)](https://github.com/mozilla-ai/surf-spot-finder/actions/workflows/docs.yaml/)
+[![Ruff](https://github.com/mozilla-ai/surf-spot-finder/actions/workflows/lint.yaml/badge.svg?label=Ruff)](https://github.com/mozilla-ai/surf-spot-finder/actions/workflows/lint.yaml/)
+
+[Blueprints Hub](https://developer-hub.mozilla.ai/)
+| [Documentation](https://mozilla-ai.github.io/surf-spot-finder/)
+| [Getting Started](https://mozilla-ai.github.io/surf-spot-finder/getting-started)
+| [Contributing](CONTRIBUTING.md)
 
 </div>
 
-
+# Surf Spot Finder: a Blueprint for comparing agent frameworks on a specific task
 
 Many Large Language Model (LLM) capabilities are unlocked when they are given access to tools and given control of their
 own runtime and execution path. However, it's important that as they are given greater capabilities, they are properly
@@ -33,14 +47,10 @@ adapted to the Agent use case you have in mind.
 This implementation uses the [smolagents](https://huggingface.co/docs/smolagents/index) library for Agentic capabilities, alongside
 of the increasingly Model Context Protocol (MCP) which allows for a standard access communication standard for a large number of tools.
 
-📘 To explore this project further and discover other Blueprints, visit the [**Blueprints Hub**](https://developer-hub.mozilla.ai/).
-
-### Built with
-![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
-[![smolagents](https://img.shields.io/badge/Smolagents-%F0%9F%A4%97-yellow)](https://huggingface.co/docs/smolagents/index)
-
 
 ## 🚀 Quick Start
+
+Try out our demo on HF Spaces: [![Try on Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Try%20on-Spaces-blue)](https://huggingface.co/spaces/mozilla-ai/surf-spot-finder)
 
 ### 1️⃣ Clone the Project
 ```bash
