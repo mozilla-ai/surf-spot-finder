@@ -1,6 +1,6 @@
 # Custom gitignores
 uv.lock
-
+hf-space
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
