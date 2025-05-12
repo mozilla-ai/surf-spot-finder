@@ -22,10 +22,9 @@ jobs:
           echo "BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD)" >> $GITHUB_ENV
 
       - run: git clone ${{ env.HTTPS_REPO}} hf-space
+
       - run: |
-          ls -alh
-      - run: |
-          cp demo/**/* hf-space
+          cp -r demo hf-space
 
       - run: |
           cd hf-space
