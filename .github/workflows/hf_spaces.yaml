@@ -16,11 +16,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      # use a dynamic branch name that way we can deploy feature branches to the HF space if we want
-      - name: Set branch name env var
-        run: |
-          echo "BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD)" >> $GITHUB_ENV
-
       - run: git clone ${{ env.HTTPS_REPO}} hf-space
 
       - run: |
@@ -36,4 +31,4 @@ jobs:
       - name: Push to Hugging Face
         run: |
           cd hf-space
-          git push ${{ env.HTTPS_REPO}} ${{ env.BRANCH_NAME }}:main
+          git push ${{ env.HTTPS_REPO}} main
