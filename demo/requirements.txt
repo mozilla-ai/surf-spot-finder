@@ -1,0 +1,5 @@
+streamlit
+openai-agents>=0.0.14
+any-agent @ git+https://github.com/mozilla-ai/any-agent
+surf-spot-finder @ git+https://github.com/mozilla-ai/surf-spot-finder
+nest_asyncio
