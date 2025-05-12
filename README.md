@@ -1,18 +1,3 @@
----
-title: Surf Spot Finder
-emoji: 🚀
-colorFrom: red
-colorTo: red
-sdk: docker
-app_port: 8501
-tags:
-- streamlit
-pinned: false
-short_description: Find a surf spot near you
-license: apache-2.0
----
-
-
 <p align="center">
   <picture>
     <!-- When the user prefers dark mode, show the white logo -->

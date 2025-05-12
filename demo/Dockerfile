@@ -9,8 +9,8 @@ RUN apt-get update && apt-get install -y \
     git \
     && rm -rf /var/lib/apt/lists/*
 
-COPY demo/requirements.txt ./
-COPY demo/ ./demo/
+COPY requirements.txt ./
+COPY . ./demo/
 
 RUN pip3 install -r requirements.txt
 
