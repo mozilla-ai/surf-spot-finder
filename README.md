@@ -96,3 +96,18 @@ This project is licensed under the Apache 2.0 License. See the [LICENSE](LICENSE
 ## Contributing
 
 Contributions are welcome! To get started, you can check out the [CONTRIBUTING.md](CONTRIBUTING.md) file.
+
+
+---
+title: Surf Spot Finder
+emoji: 🚀
+colorFrom: red
+colorTo: red
+sdk: docker
+app_port: 8501
+tags:
+- streamlit
+pinned: false
+short_description: Find a surf spot near you
+license: apache-2.0
+---
