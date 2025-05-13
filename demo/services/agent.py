@@ -103,18 +103,6 @@ async def configure_agent(user_inputs: UserInputs) -> tuple[AnyAgent, Config]:
 
 
 async def display_output(agent_trace: AgentTrace, execution_time: float):
-    cost: TotalTokenUseAndCost = agent_trace.get_total_cost()
-    with st.expander("### 🏄 Results", expanded=True):
-        time_col, cost_col, tokens_col = st.columns(3)
-        with time_col:
-            st.info(f"⏱️ Execution Time: {execution_time:.2f} seconds")
-        with cost_col:
-            st.info(f"💰 Estimated Cost: ${cost.total_cost:.6f}")
-        with tokens_col:
-            st.info(f"📦 Total Tokens: {cost.total_tokens:,}")
-        st.markdown("#### Final Output")
-        st.info(agent_trace.final_output)
-
     # Display the agent trace in a more organized way
     with st.expander("### 🧩 Agent Trace"):
         for span in agent_trace.spans:
@@ -150,6 +138,18 @@ async def display_output(agent_trace: AgentTrace, execution_time: float):
                     f"<span style='color: {status_color}'>● {span.status.status_code.name}</span>",
                     unsafe_allow_html=True,
                 )
+
+    cost: TotalTokenUseAndCost = agent_trace.get_total_cost()
+    with st.expander("### 🏄 Results", expanded=True):
+        time_col, cost_col, tokens_col = st.columns(3)
+        with time_col:
+            st.info(f"⏱️ Execution Time: {execution_time:.2f} seconds")
+        with cost_col:
+            st.info(f"💰 Estimated Cost: ${cost.total_cost:.6f}")
+        with tokens_col:
+            st.info(f"📦 Total Tokens: {cost.total_tokens:,}")
+        st.markdown("#### Final Output")
+        st.info(agent_trace.final_output)
 
 
 async def run_agent(agent, config) -> tuple[AgentTrace, float]:
