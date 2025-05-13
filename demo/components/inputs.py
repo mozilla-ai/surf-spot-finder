@@ -48,16 +48,11 @@ def get_area(area_name: str) -> dict:
 def get_user_inputs() -> UserInputs:
     default_val = "Los Angeles California, US"
 
-    col1, col2 = st.columns([3, 1])
-    with col1:
-        location = st.text_input("Enter a location", value=default_val)
-    with col2:
-        if location:
-            location_check = get_area(location)
-            if not location_check:
-                st.error("❌")
-            else:
-                st.success("✅")
+    location = st.text_input("Enter a location", value=default_val)
+    if location:
+        location_check = get_area(location)
+        if not location_check:
+            st.error("❌ Invalid location")
 
     max_driving_hours = st.number_input(
         "Enter the maximum driving hours", min_value=1, value=2

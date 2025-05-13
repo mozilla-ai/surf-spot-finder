@@ -4,7 +4,7 @@ from constants import DEFAULT_TOOLS
 import streamlit as st
 import time
 from surf_spot_finder.config import Config
-from any_agent import AgentConfig, AnyAgent, TracingConfig
+from any_agent import AgentConfig, AnyAgent, TracingConfig, AgentFramework
 from any_agent.tracing.trace import AgentTrace, TotalTokenUseAndCost
 from any_agent.tracing.otel_types import StatusCode
 from any_agent.evaluation import evaluate, TraceEvaluationResult
@@ -70,9 +70,15 @@ async def configure_agent(user_inputs: UserInputs) -> tuple[AnyAgent, Config]:
     else:
         model_args = {}
 
+    if user_inputs.framework == AgentFramework.AGNO:
+        agent_args = {"tool_call_limit": 20}
+    else:
+        agent_args = {}
+
     agent_config = AgentConfig(
         model_id=user_inputs.model_id,
         model_args=model_args,
+        agent_args=agent_args,
         tools=DEFAULT_TOOLS,
     )
 
@@ -155,10 +161,26 @@ async def run_agent(agent, config) -> tuple[AgentTrace, float]:
     )
 
     st.code(query, language="text")
+    kwargs = {}
+    if (
+        config.framework == AgentFramework.OPENAI
+        or config.framework == AgentFramework.TINYAGENT
+    ):
+        kwargs["max_turns"] = 20
+    elif config.framework == AgentFramework.SMOLAGENTS:
+        kwargs["max_steps"] = 20
+    if config.framework == AgentFramework.LANGCHAIN:
+        from langchain_core.runnables import RunnableConfig
+
+        kwargs["config"] = RunnableConfig(recursion_limit=20)
+    elif config.framework == AgentFramework.GOOGLE:
+        from google.adk.agents.run_config import RunConfig
+
+        kwargs["run_config"] = RunConfig(max_llm_calls=20)
 
     start_time = time.time()
     with st.spinner("🤔 Analyzing surf spots..."):
-        agent_trace: AgentTrace = await agent.run_async(query)
+        agent_trace: AgentTrace = await agent.run_async(query, **kwargs)
         agent.exit()
 
     end_time = time.time()
