@@ -14,7 +14,7 @@
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 [![](https://dcbadge.limes.pink/api/server/YuMNeuKStr?style=flat)](https://discord.gg/YuMNeuKStr) <br>
-[![Try on Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Try%20on-Spaces-blue)](https://huggingface.co/spaces/mozilla-ai/speaches-demo)
+[![Try on Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Try%20on-Spaces-blue)](https://huggingface.co/spaces/mozilla-ai/surf-spot-finder)
 [![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?logo=streamlit&logoColor=white)](https://streamlit.io/)
 [![LiteLLM](https://img.shields.io/badge/🚅%20LiteLLM-1E90FF)](https://www.litellm.ai/)
 [![Any-Agent](https://img.shields.io/badge/🎨%20Any--Agent-white)](https://github.com/mozilla-ai/any-agent) <br>
