@@ -31,7 +31,11 @@ DEFAULT_EVALUATION_CASE = EvaluationCase(
             "points": 1,
         },
         {
-            "criteria": "Check if the agent gathered wind and wave forecasts for each surf spot being evaluated.",
+            "criteria": "Check if the agent gathered wind forecasts for each surf spot being evaluated.",
+            "points": 1,
+        },
+        {
+            "criteria": "Check if the agent gathered wave forecasts for each surf spot being evaluated.",
             "points": 1,
         },
         {
@@ -48,10 +52,6 @@ DEFAULT_EVALUATION_CASE = EvaluationCase(
         },
         {
             "criteria": "Check if the final answer includes information about some alternative surf spots if the user is not satisfied with the chosen one",
-            "points": 1,
-        },
-        {
-            "criteria": "Check that the agent completed in fewer than 10 calls",
             "points": 1,
         },
     ],
