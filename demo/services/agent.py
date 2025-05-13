@@ -224,11 +224,9 @@ async def run_agent(agent, config) -> tuple[AgentTrace, float]:
         export_logs(agent, update_span)
         start_time = time.time()
         agent_trace: AgentTrace = await agent.run_async(query, **kwargs)
-        status.update(
-            label="Agent has finished running", expanded=False, state="complete"
-        )
+        status.update(label="Finished!", expanded=False, state="complete")
         end_time = time.time()
 
         agent.exit()
-    execution_time = end_time - start_time
-    return agent_trace, execution_time
+        execution_time = end_time - start_time
+        return agent_trace, execution_time
