@@ -1,6 +1,6 @@
 # 🎨 **Customization Guide**
 
-The surf-spot-finder blueprint is designed to be flexible and adaptable for different use cases through modifying the YAML configuration file and mofifying the `config.py` file.
+The surf-spot-finder blueprint is designed to be flexible and adaptable for different use cases through modifying the YAML configuration file and mofifying the `config.py` and `cli.py` files.
 
 ---
 
@@ -37,7 +37,7 @@ You can swap either the model to see how it affects the agent's performance:
 
 ```yaml
 main_agent:
-  model_id: "openai/gpt-4o-mini"
+  model_id: "openai/gpt-4.1-mini"
 ```
 
 ### 3. Create Custom Tools
@@ -78,12 +78,20 @@ def get_weather_forecast(location: str, date: str) -> List[Dict]:
 
 ```
 
+Ensure you update the `__init__.py` file in the tools folder:
+```python
+from .hike_finder_tools import get_weather_forecast
+
+__all__ = [
+    "get_weather_forecast",
+]
+```
+
 You can then add the tools to the yaml file
 ```yaml
 # For the hiking spot finder
 tools:
-  - "hiking_tools.get_weather_forecast"
-  - "hiking_tools.get_trail_conditions" #if you had a second tool
+  - "surf_spot_finder.tools.get_weather_forecast"
 ```
 
 ### 4. Customize evaluation cases and evaluation model
@@ -117,15 +125,15 @@ input_prompt_template: |
   - Scenic viewpoints
 
 main_agent:
-  model_id: "openai/gpt-4.1-nano"
-    tools:
+  model_id: "openai/gpt-4.1-mini"
+  tools:
     - "hiking_tools.get_weather_forecast"
     - "hiking_tools.get_trail_conditions"
     - "any_agent.tools.search_web"
     - "any_agent.tools.visit_webpage"
 
 evaluation_cases:
-  - llm_judge: "openai/gpt-4o-mini"
+  - llm_judge: "openai/gpt-4.1-nano"
     checkpoints:
       - criteria: "Check if the agent used the get_weather_forecast tool and it succeeded"
         points: 1
@@ -133,14 +141,21 @@ evaluation_cases:
         points: 1
 ```
 
-## Part 2 - Modifying the config file
+## Part 2 - Modifying the config file and the cli file
 
 You'll need to edit `src/surf_spot_finder/config.py` to:
-1. Update the validation requirements for your use case
-2. Add support for any new parameters you need
-3. Modify the Config class to handle your specific parameters requirements
 
-For example, for the Hiking Spot Finder example, you may want to remove references to `{MAX_DRIVING_HOURS}`, as its not in the prompt.
+  - Update the validation requirements for your use case
+  - Add support for any new parameters you need
+  - Modify the Config class to handle your specific parameters requirements
+
+*For example, for the Hiking Spot Finder example, you may want to remove references to `{MAX_DRIVING_HOURS}`, as its not in the prompt.*
+
+You'll likely also need to edit `src/surf_spot_finder/cli.py` to:
+
+- Update the input prompt template depending on your specific parameter requirements.
+
+*For example, for the Hiking Spot Finder example, you may want to remove references to `{MAX_DRIVING_HOURS}`, as its not in the prompt.*
 
 ## Part 3 - Running the agent
 
