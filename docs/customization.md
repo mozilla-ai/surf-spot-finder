@@ -140,7 +140,7 @@ You'll need to edit `src/surf_spot_finder/config.py` to:
 2. Add support for any new parameters you need
 3. Modify the Config class to handle your specific parameters requirements
 
-For example, for the Hiking Spot Finder example, you mmay want to remove references to `{MAX_DRIVING_HOURS}`, as its not in the prompt.
+For example, for the Hiking Spot Finder example, you may want to remove references to `{MAX_DRIVING_HOURS}`, as its not in the prompt.
 
 ## Part 3 - Running the agent
 
