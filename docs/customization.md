@@ -138,9 +138,9 @@ evaluation_cases:
 You'll need to edit `src/surf_spot_finder/config.py` to:
 1. Update the validation requirements for your use case
 2. Add support for any new parameters you need
-3. Modify the Config class to handle your specific tools
+3. Modify the Config class to handle your specific parameters requirements
 
-For example, for the Hiking Spot Finder example, you mmay want to remove references to `{MAX_DRIVING_HOURS}`, as its not in your prompt.
+For example, for the Hiking Spot Finder example, you mmay want to remove references to `{MAX_DRIVING_HOURS}`, as its not in the prompt.
 
 ## Part 3 - Running the agent
 
