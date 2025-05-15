@@ -1,10 +1,13 @@
+import os
+
 from any_agent.evaluation import EvaluationCase
 from surf_spot_finder.tools import (
     get_area_lat_lon,
     get_wave_forecast,
     get_wind_forecast,
 )
-from any_agent.tools.web_browsing import search_web, visit_webpage
+from any_agent.logging import logger
+from any_agent.tools.web_browsing import search_web, visit_webpage, search_tavily
 
 MODEL_OPTIONS = [
     # "huggingface/novita/deepseek-ai/DeepSeek-V3",
@@ -13,7 +16,7 @@ MODEL_OPTIONS = [
     "openai/gpt-4.1-mini",
     "openai/gpt-4o",
     "gemini/gemini-2.0-flash-lite",
-    "gemini-2.0-flash",
+    "gemini/gemini-2.0-flash",
     # "huggingface/Qwen/Qwen3-32B", # right now throwing an internal error, but novita qwen isn't supporting tool calling
 ]
 
@@ -65,3 +68,7 @@ DEFAULT_TOOLS = [
     search_web,
     visit_webpage,
 ]
+if os.getenv("TAVILY_API_KEY"):
+    DEFAULT_TOOLS.append(search_tavily)
+else:
+    logger.warning("TAVILY_API_KEY not set, skipping Tavily search tool")
