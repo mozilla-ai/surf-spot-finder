@@ -19,7 +19,7 @@ jobs:
       - run: git clone ${{ env.HTTPS_REPO}} hf-space
 
       - run: |
-          cp -r demo/* hf-space
+          cp -rT demo hf-space
 
       - run: |
           cd hf-space
