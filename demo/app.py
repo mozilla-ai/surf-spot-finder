@@ -40,9 +40,9 @@ async def main():
     # Handle agent execution button click
     if run_button:
         agent, agent_config = await configure_agent(user_inputs)
-        agent_trace, execution_time = await run_agent(agent, agent_config)
+        agent_trace = await run_agent(agent, agent_config)
 
-        await display_output(agent_trace, execution_time)
+        await display_output(agent_trace)
 
         evaluation_result = await evaluate_agent(agent_config, agent_trace)
 

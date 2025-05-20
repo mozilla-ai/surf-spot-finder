@@ -8,6 +8,7 @@ from any_agent.evaluation import EvaluationCase
 from any_agent.evaluation.schemas import CheckpointCriteria
 import pandas as pd
 from constants import DEFAULT_EVALUATION_CASE, MODEL_OPTIONS
+import copy
 
 from pydantic import BaseModel, ConfigDict
 
@@ -98,7 +99,7 @@ def get_user_inputs() -> UserInputs:
             index=2,
             format_func=lambda x: "/".join(x.split("/")[-3:]),
         )
-        evaluation_case = DEFAULT_EVALUATION_CASE
+        evaluation_case = copy.deepcopy(DEFAULT_EVALUATION_CASE)
         evaluation_case.llm_judge = evaluation_model_id
         # make this an editable json section
         # convert the checkpoints to a df series so that it can be edited

@@ -3,7 +3,6 @@ from components.inputs import UserInputs
 from constants import DEFAULT_TOOLS
 from components.agent_status import export_logs
 import streamlit as st
-import time
 from surf_spot_finder.config import Config
 from any_agent import AgentConfig, AnyAgent, TracingConfig, AgentFramework
 from any_agent.tracing.trace import AgentTrace, TotalTokenUseAndCost, AgentSpan
@@ -12,11 +11,10 @@ from any_agent.evaluation import evaluate, TraceEvaluationResult
 
 
 async def display_evaluation_results(result: TraceEvaluationResult):
-    all_results = (
-        result.checkpoint_results
-        + result.hypothesis_answer_results
-        + result.direct_results
-    )
+    if result.ground_truth_result is not None:
+        all_results = [*result.checkpoint_results, result.ground_truth_result]
+    else:
+        all_results = result.checkpoint_results
 
     # Create columns for better layout
     col1, col2 = st.columns(2)
@@ -102,7 +100,7 @@ async def configure_agent(user_inputs: UserInputs) -> tuple[AnyAgent, Config]:
     return agent, config
 
 
-async def display_output(agent_trace: AgentTrace, execution_time: float):
+async def display_output(agent_trace: AgentTrace):
     # Display the agent trace in a more organized way
     with st.expander("### 🧩 Agent Trace"):
         for span in agent_trace.spans:
@@ -142,8 +140,9 @@ async def display_output(agent_trace: AgentTrace, execution_time: float):
     cost: TotalTokenUseAndCost = agent_trace.get_total_cost()
     with st.expander("### 🏄 Results", expanded=True):
         time_col, cost_col, tokens_col = st.columns(3)
+        duration = agent_trace.duration.total_seconds()
         with time_col:
-            st.info(f"⏱️ Execution Time: {execution_time:.2f} seconds")
+            st.info(f"⏱️ Execution Time: {duration:0.2f} seconds")
         with cost_col:
             st.info(f"💰 Estimated Cost: ${cost.total_cost:.6f}")
         with tokens_col:
@@ -152,7 +151,7 @@ async def display_output(agent_trace: AgentTrace, execution_time: float):
         st.info(agent_trace.final_output)
 
 
-async def run_agent(agent, config) -> tuple[AgentTrace, float]:
+async def run_agent(agent, config) -> AgentTrace:
     st.markdown("#### 🔍 Running Surf Spot Finder with query")
 
     query = config.input_prompt_template.format(
@@ -222,11 +221,8 @@ async def run_agent(agent, config) -> tuple[AgentTrace, float]:
             status.update(label=message, expanded=False, state="running")
 
         export_logs(agent, update_span)
-        start_time = time.time()
         agent_trace: AgentTrace = await agent.run_async(query, **kwargs)
         status.update(label="Finished!", expanded=False, state="complete")
-        end_time = time.time()
 
         agent.exit()
-        execution_time = end_time - start_time
-        return agent_trace, execution_time
+        return agent_trace
