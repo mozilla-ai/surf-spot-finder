@@ -44,8 +44,7 @@ relevant information!
 Although this exact use-case may not be useful to you directly, the framework we provide here is intended to be easily
 adapted to the Agent use case you have in mind.
 
-This implementation uses the [smolagents](https://huggingface.co/docs/smolagents/index) library for Agentic capabilities, alongside
-of the increasingly Model Context Protocol (MCP) which allows for a standard access communication standard for a large number of tools.
+This implementation uses the [smolagents](https://huggingface.co/docs/smolagents/index) library for Agentic capabilities, alongside the increasingly popular Model Context Protocol (MCP) which allows for a standard access communication standard for a large number of tools.
 
 
 ## 🚀 Quick Start
