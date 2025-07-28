@@ -29,4 +29,4 @@ Get started with Surf-Spot-Finder using one of the options below:
 
 === "🤗 HuggingFace Space"
 
-    Try the [Huggingface Spaces Demo](https://huggingface.co/spaces/mozilla-ai/surf-spot-finder) 🤗!
+    Try the [Huggingface Spaces Demo](https://huggingface.co/spaces/mozilla-ai/any-agent-demo) 🤗!
