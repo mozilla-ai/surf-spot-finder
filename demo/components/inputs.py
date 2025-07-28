@@ -37,7 +37,7 @@ def get_area(area_name: str) -> dict:
         dict: The area found.
     """
     response = requests.get(
-        f"https://nominatim.openstreetmap.org/search?q={area_name}&format=json",
+        f"https://nominatim.openstreetmap.org/search?q={area_name}&format=jsonv2",
         headers={"User-Agent": "Mozilla/5.0"},
         timeout=5,
     )
