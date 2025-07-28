@@ -9,8 +9,8 @@ jobs:
   sync-space:
     runs-on: ubuntu-latest
     env:
-      REPO_NAME: mozilla-ai/surf-spot-finder
-      HTTPS_REPO: https://${{ secrets.HF_USERNAME }}:${{ secrets.HF_TOKEN }}@huggingface.co/spaces/mozilla-ai/surf-spot-finder
+      REPO_NAME: mozilla-ai/any-agent-demo
+      HTTPS_REPO: https://${{ secrets.HF_USERNAME }}:${{ secrets.HF_TOKEN }}@huggingface.co/spaces/mozilla-ai/any-agent-demo
     steps:
       - uses: actions/checkout@v4
         with:
