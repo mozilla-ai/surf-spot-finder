@@ -14,7 +14,7 @@ def get_area_lat_lon(area_name: str) -> tuple[float, float]:
         The area found.
     """
     response = requests.get(
-        f"https://nominatim.openstreetmap.org/search?q={area_name}&format=json",
+        f"https://nominatim.openstreetmap.org/search?q={area_name}&format=jsonv2",
         headers={"User-Agent": "Mozilla/5.0"},
     )
     response.raise_for_status()
