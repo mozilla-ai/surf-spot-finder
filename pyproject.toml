@@ -13,7 +13,7 @@ dependencies = [
   "fire",
   "pydantic",
   "pyyaml",
-  "litellm",
+  "litellm==1.63.14",
   "geocoder>=1.38.1",
   "rich>=14.0.0",
 ]
